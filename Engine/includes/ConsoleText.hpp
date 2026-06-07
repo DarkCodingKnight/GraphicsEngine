@@ -18,7 +18,7 @@ const std::string purpleColor = "35m";
 const std::string turquoiseColor = "36m";
 const std::string whiteColor = "37m";
 
-const std::string errorMessage = "31mERROR :) ";
+const std::string errorMessage = "31mERROR :( ";
 
 inline static void printText(std::string color, std::string message, std::string className = "") {
     if (className == "") {

@@ -35,12 +35,8 @@ void Vulkan::createInstance(const char* appName) {
         debugMessengerCreateInfo = {};
         setupDebugMessenger(&debugMessengerCreateInfo);
         instanceCreateInfo.pNext = &debugMessengerCreateInfo;
-        
-        //instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-        //instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
     }
     else {
-        //instanceCreateInfo.enabledLayerCount = 0;
         instanceCreateInfo.pNext = nullptr;
     }
     
@@ -138,7 +134,7 @@ bool Vulkan::checkValidationLayerSupport() {
 void Vulkan::pickPhysicalDevice() {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
-    std::vector<VkPhysicalDevice> devices;
+    std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
     
     for (const auto& device : devices) {
