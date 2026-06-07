@@ -1,0 +1,46 @@
+cmake_minimum_required(VERSION 3.12)
+
+set(PROJECT_NAME Engine)
+set(CMAKE_CXX_STANDARD 17)
+
+#--------------PROJECT FILES--------------
+
+set(ENGINE_PRIVATE_INCLUDES
+	includes/Application.hpp
+	includes/Window.hpp
+	includes/ConsoleText.hpp
+	includes/Vulkan_Init.hpp
+)
+
+set(ENGINE_PRIVATE_SOURCES
+	src/Application.cpp
+	src/Window.cpp
+	src/Vulkan_Init.cpp
+)
+
+set(PROJECT_INCLUDES_SOURCES
+	${ENGINE_PRIVATE_INCLUDES}
+	${ENGINE_PRIVATE_SOURCES}
+)
+
+add_library(${PROJECT_NAME} STATIC ${PROJECT_INCLUDES_SOURCES})
+target_include_directories(${PROJECT_NAME} PUBLIC includes)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+
+#--------------LIBRARIES--------------
+
+add_subdirectory(external/glfw)
+add_subdirectory(external/glm)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC glm 
+					     glfw)
+
+include_directories(${PROJECT_NAME} external/stb_image)
+
+#-------------------Vulkan init--------------
+
+
+
+find_package(Vulkan REQUIRED)
+target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
