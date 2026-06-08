@@ -14,6 +14,7 @@ public:
               const char* windowTitle,
               bool enableValidationLayers);
     void mainLoop();
+    void cleanUp();
     
     ~Application() {};
     

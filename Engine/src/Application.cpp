@@ -16,16 +16,21 @@ int Application::Start(int windowWidth,
     pVulkan = &vulkan;
     pVulkan->initVulkan(windowTitle, enableValidationLayers);
     pVulkan->pickPhysicalDevice();
+    pVulkan->createLogicalDevice();
     
     mainLoop();
+    cleanUp();
 }
 
 void Application::mainLoop() {
     while(!(pWindow->isWindowClose())) {
         glfwPollEvents();
     }
-    pWindow->destroyWindow();
+}
+
+void Application::cleanUp() {
     pVulkan->cleanUp();
+    pWindow->destroyWindow();
 }
 
 }

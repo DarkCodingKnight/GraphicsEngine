@@ -40,6 +40,13 @@ void Vulkan::createInstance(const char* appName) {
         instanceCreateInfo.pNext = nullptr;
     }
     
+    //FOR WINDOWS & LINUX
+    //if (enableValidationLayers) {
+    //    instanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+    //    instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+    //}
+    //else instanceCreateInfo.enabledLayerCount = 0;
+    
     VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
     
     if (result != VK_SUCCESS) {
@@ -101,6 +108,119 @@ void Vulkan::checkInstanceExtensionSupport() {
     }
 }
 
+void Vulkan::pickPhysicalDevice() {
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+    
+    for (const auto& device : devices) {
+        if(isDeviceSuitable(device)) {
+            physicalDevice = device;
+            break;
+        }
+    }
+    
+    if (physicalDevice == VK_NULL_HANDLE) {
+        ConsoleText::printError("Failed to find a suitable GPU!", "Vulkan");
+        std::exit(0);
+    }
+    else ConsoleText::printGreen("Suitable GPU was founded!", "Vulkan");
+}
+
+bool Vulkan::isDeviceSuitable(VkPhysicalDevice device) {
+    QueueFamilyIndices indices = findQueueFamilies(device);
+    
+    if (indices.isComplete() && checkDeviceExtensionSupport(device)) {
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+        VkPhysicalDeviceFeatures deviceFeatures;
+        vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+        
+        std::string APIversion = "API version: " + std::to_string(deviceProperties.apiVersion);
+        std::string diverVersion = "Driver version: " + std::to_string(deviceProperties.driverVersion);
+        std::string deviceName = "GPU name: " + (std::string)(deviceProperties.deviceName);
+        
+        ConsoleText::printGreen("Device properties: ", "Vulkan");
+        ConsoleText::printGreen(APIversion);
+        ConsoleText::printGreen(diverVersion);
+        ConsoleText::printGreen(deviceName);
+        
+        return true;
+    }
+    else return false;
+}
+
+QueueFamilyIndices Vulkan::findQueueFamilies(VkPhysicalDevice device) {
+    QueueFamilyIndices indices;
+    
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+    
+    int i = 0;
+    for (const auto& queueFamily : queueFamilies) {
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            indices.graphicsFamily = i;
+        }
+        if (indices.isComplete()) break;
+        i++;
+    }
+    
+    return indices;
+}
+
+bool Vulkan::checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice) {
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, availableExtensions.data());
+    
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+    
+    for (const auto& extension : availableExtensions) {
+        requiredExtensions.erase(extension.extensionName);
+    }
+    
+    return requiredExtensions.empty();
+}
+
+void Vulkan::createLogicalDevice() {
+    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+    
+    VkDeviceQueueCreateInfo queueCreateInfo{};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+    queueCreateInfo.queueCount = 1;
+    float queuePriority = 1.0f;
+    queueCreateInfo.pQueuePriorities = &queuePriority;
+    
+    VkPhysicalDeviceFeatures deviceFeatures{};
+    
+    VkDeviceCreateInfo logicalDeviceCreateInfo{};
+    logicalDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    logicalDeviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+    logicalDeviceCreateInfo.queueCreateInfoCount = 1;
+    logicalDeviceCreateInfo.pEnabledFeatures = &deviceFeatures;
+    logicalDeviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    logicalDeviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+    
+    //FOR WINDOWS & LINUX
+    //if (enableValidationLayers) {
+    //    logicalDeviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+    //    logicalDeviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+    //}
+    //else logicalDeviceCreateInfo.enabledLayerCount = 0;
+    
+    if (vkCreateDevice(physicalDevice, &logicalDeviceCreateInfo, nullptr, &logicalDevice) != VK_SUCCESS) {
+        ConsoleText::printError("Filed to create logical device!", "Vulkan");
+        std::exit(0);
+    }
+    else ConsoleText::printGreen("Logical device was created!", "Vulkan");
+}
+
+
 bool Vulkan::checkValidationLayerSupport() {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -129,46 +249,6 @@ bool Vulkan::checkValidationLayerSupport() {
     }
     
     return true;
-}
-
-void Vulkan::pickPhysicalDevice() {
-    uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
-    std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
-    
-    for (const auto& device : devices) {
-        if(isDeviceSuitable(device)) {
-            physicalDevice = device;
-            break;
-        }
-    }
-    
-    if (physicalDevice == VK_NULL_HANDLE) ConsoleText::printError("Failed to find a suitable GPU!", "Vulkan");
-}
-
-bool Vulkan::isDeviceSuitable(VkPhysicalDevice device) {
-    VkPhysicalDeviceProperties deviceProperties;
-    vkGetPhysicalDeviceProperties(device, &deviceProperties);
-    VkPhysicalDeviceFeatures deviceFeatures;
-    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-    
-    std::string APIversion = "API version: " + std::to_string(deviceProperties.apiVersion);
-    std::string diverVersion = "Driver version: " + std::to_string(deviceProperties.driverVersion);
-    std::string deviceName = "GPU name: " + (std::string)(deviceProperties.deviceName);
-    
-    ConsoleText::printGreen("Device properties: ", "Vulkan");
-    ConsoleText::printGreen(APIversion);
-    ConsoleText::printGreen(diverVersion);
-    ConsoleText::printGreen(deviceName);
-    
-    return true;
-}
-
-QueueFamilyIndices Vulkan::findQueueFamilies(VkPhysicalDevice device) {
-    QueueFamilyIndices indices;
-    
-    return indices;
 }
 
 void Vulkan::setupDebugMessenger(VkDebugUtilsMessengerCreateInfoEXT* debugMessengerCreateInfo) {
@@ -212,6 +292,9 @@ void Vulkan::destroyDebuUtilsMessenger(VkInstance instance,
 }
 
 void Vulkan::cleanUp() {
+    vkDestroyDevice(logicalDevice, nullptr);
+    ConsoleText::printGreen("Logical device was Destroyed!", "Vulkan");
+    
     if (enableValidationLayers) {
         destroyDebuUtilsMessenger(instance, debugMessenger, nullptr);
     }

@@ -4,13 +4,25 @@
 #include <vulkan/vulkan.h>
 #include <iostream>
 #include <vector>
+#include <optional>
+#include <string>
+#include <set>
 
 #include "ConsoleText.hpp"
 
 namespace Engine {
 
 struct QueueFamilyIndices {
-    uint32_t graphicsFamily;
+    std::optional<uint32_t> graphicsFamily;
+    
+    bool isComplete() {
+        return graphicsFamily.has_value();
+    }
+};
+
+const std::vector<const char*> deviceExtensions = {
+    //"VK_KHR_swapchain",
+    "VK_KHR_portability_subset",
 };
 
 const std::vector<const char*> validationLayers = {
@@ -57,8 +69,11 @@ public:
     void checkInstanceExtensionSupport();
     
     void pickPhysicalDevice();
-    bool isDeviceSuitable(VkPhysicalDevice device);
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+    bool isDeviceSuitable(VkPhysicalDevice physicalDevice);
+    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physicalDevice);
+    bool checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
+    
+    void createLogicalDevice();
     
     //Validation layers
     void setupDebugMessenger(VkDebugUtilsMessengerCreateInfoEXT* debugMessengerCreateInfo);
@@ -81,6 +96,7 @@ private:
     
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkDevice logicalDevice = VK_NULL_HANDLE;
     
     VkDebugUtilsMessengerEXT debugMessenger;
     VkDebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo;
