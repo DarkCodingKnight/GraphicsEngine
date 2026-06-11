@@ -4,4 +4,9 @@ set(PROJECT_NAME EngineEditor)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	BUILD_RPATH "/opt/homebrew/lib"
+	INSTALL_RPATH "@executable_path/../Frameworks"
+)
+
 target_link_libraries(${PROJECT_NAME} Engine)

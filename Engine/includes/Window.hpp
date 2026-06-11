@@ -18,6 +18,8 @@ public:
     int isWindowClose();
     void destroyWindow();
     
+    GLFWwindow* getWindowPtr() { return pGLFWWindow; };
+    
     ~Window() {};
     
 private:

@@ -8,6 +8,11 @@ void Vulkan::initVulkan(const char* appName,
     
     createInstance(appName);
     checkInstanceExtensionSupport();
+    
+    if (enableValidationLayers) {
+        checkValidationLayerSupport();
+        createDebugUtilsMessenger(instance, &debugMessengerCreateInfo, nullptr, &debugMessenger);
+    }
 }
 
 void Vulkan::createInstance(const char* appName) {
@@ -23,6 +28,7 @@ void Vulkan::createInstance(const char* appName) {
     std::vector<const char*> extensions = getGLFWExtensions();
     extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
     extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+    extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
     if (enableValidationLayers) extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     
     VkInstanceCreateInfo instanceCreateInfo{};
@@ -75,11 +81,6 @@ void Vulkan::createInstance(const char* appName) {
         std:exit(0);
     }
     ConsoleText::printGreen("Instance was created!", "Vulkan");
-    
-    if (enableValidationLayers) {
-        checkValidationLayerSupport();
-        createDebugUtilsMessenger(instance, &debugMessengerCreateInfo, nullptr, &debugMessenger);
-    }
 }
 
 std::vector<const char*> Vulkan::getGLFWExtensions() {
@@ -137,9 +138,9 @@ bool Vulkan::isDeviceSuitable(VkPhysicalDevice device) {
         VkPhysicalDeviceFeatures deviceFeatures;
         vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
         
-        std::string APIversion = "API version: " + std::to_string(deviceProperties.apiVersion);
-        std::string diverVersion = "Driver version: " + std::to_string(deviceProperties.driverVersion);
-        std::string deviceName = "GPU name: " + (std::string)(deviceProperties.deviceName);
+        std::string APIversion = "\tAPI version: " + std::to_string(deviceProperties.apiVersion);
+        std::string diverVersion = "\tDriver version: " + std::to_string(deviceProperties.driverVersion);
+        std::string deviceName = "\tGPU name: " + (std::string)(deviceProperties.deviceName);
         
         ConsoleText::printGreen("Device properties: ", "Vulkan");
         ConsoleText::printGreen(APIversion);
@@ -159,23 +160,32 @@ QueueFamilyIndices Vulkan::findQueueFamilies(VkPhysicalDevice device) {
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
     
-    int i = 0;
+    int index = 0;
     for (const auto& queueFamily : queueFamilies) {
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, index, surface, &presentSupport);
+        
+        //Graphics queue support
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-            indices.graphicsFamily = i;
+            indices.graphicsFamily = index;
         }
+        
+        //Present queue support
+        if (presentSupport) indices.presentFamily = index;
+        
+        //If present and graphics queues are supported -> break
         if (indices.isComplete()) break;
-        i++;
+        index++;
     }
     
     return indices;
 }
 
-bool Vulkan::checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice) {
+bool Vulkan::checkDeviceExtensionSupport(VkPhysicalDevice device) {
     uint32_t extensionCount;
-    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
     std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, availableExtensions.data());
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
     
     std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
     
@@ -186,22 +196,41 @@ bool Vulkan::checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice) {
     return requiredExtensions.empty();
 }
 
+void Vulkan::createSurface(GLFWwindow* window) {
+    if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+        ConsoleText::printError("Failed to create window surface!", "Vulkan");
+        std::exit(0);
+    }
+    else {
+        ConsoleText::printGreen("Window surface was created!", "Vulkan");
+    }
+}
+
 void Vulkan::createLogicalDevice() {
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
     
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-    queueCreateInfo.queueCount = 1;
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = {
+        indices.graphicsFamily.value(),
+        indices.presentFamily.value()
+    };
+    
     float queuePriority = 1.0f;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
+    for (uint32_t queueFamily : uniqueQueueFamilies) {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
     
     VkPhysicalDeviceFeatures deviceFeatures{};
     
     VkDeviceCreateInfo logicalDeviceCreateInfo{};
     logicalDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    logicalDeviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
-    logicalDeviceCreateInfo.queueCreateInfoCount = 1;
+    logicalDeviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    logicalDeviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
     logicalDeviceCreateInfo.pEnabledFeatures = &deviceFeatures;
     logicalDeviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
     logicalDeviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
@@ -218,6 +247,9 @@ void Vulkan::createLogicalDevice() {
         std::exit(0);
     }
     else ConsoleText::printGreen("Logical device was created!", "Vulkan");
+    
+    vkGetDeviceQueue(logicalDevice, indices.graphicsFamily.value(), 0, &graphicsQueue);
+    vkGetDeviceQueue(logicalDevice, indices.presentFamily.value(), 0, &presentQueue);
 }
 
 
@@ -298,6 +330,9 @@ void Vulkan::cleanUp() {
     if (enableValidationLayers) {
         destroyDebuUtilsMessenger(instance, debugMessenger, nullptr);
     }
+    
+    vkDestroySurfaceKHR(instance, surface, nullptr);
+    ConsoleText::printGreen("Surface was destroyed!", "Vulkan");
     
     vkDestroyInstance(instance, nullptr);
     ConsoleText::printGreen("Instance was destroyed!", "Vulkan");

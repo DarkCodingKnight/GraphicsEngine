@@ -15,6 +15,7 @@ int Application::Start(int windowWidth,
     Vulkan vulkan = Vulkan();
     pVulkan = &vulkan;
     pVulkan->initVulkan(windowTitle, enableValidationLayers);
+    pVulkan->createSurface(pWindow->getWindowPtr());
     pVulkan->pickPhysicalDevice();
     pVulkan->createLogicalDevice();
     

@@ -1,5 +1,8 @@
 #pragma once
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 #include <iostream>
@@ -14,15 +17,16 @@ namespace Engine {
 
 struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
+    std::optional<uint32_t> presentFamily;
     
     bool isComplete() {
-        return graphicsFamily.has_value();
+        return graphicsFamily.has_value() && presentFamily.has_value();
     }
 };
 
 const std::vector<const char*> deviceExtensions = {
-    //"VK_KHR_swapchain",
     "VK_KHR_portability_subset",
+    "VK_KHR_swapchain"
 };
 
 const std::vector<const char*> validationLayers = {
@@ -67,13 +71,12 @@ public:
                     bool enableValidationLayers);
     void createInstance(const char* appName);
     void checkInstanceExtensionSupport();
-    
     void pickPhysicalDevice();
-    bool isDeviceSuitable(VkPhysicalDevice physicalDevice);
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice physicalDevice);
-    bool checkDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
-    
+    bool isDeviceSuitable(VkPhysicalDevice device);
+    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     void createLogicalDevice();
+    void createSurface(GLFWwindow* window);
     
     //Validation layers
     void setupDebugMessenger(VkDebugUtilsMessengerCreateInfoEXT* debugMessengerCreateInfo);
@@ -93,6 +96,11 @@ public:
     
 private:
     bool enableValidationLayers = false;
+    
+    VkQueue graphicsQueue = VK_NULL_HANDLE;
+    VkQueue presentQueue = VK_NULL_HANDLE;
+    
+    VkSurfaceKHR surface = VK_NULL_HANDLE;
     
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
