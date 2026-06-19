@@ -23,7 +23,6 @@ public:
                           TITLE,
                           enableValidationLayers);
     }
-    
     ~Editor() {};
     
 private:

@@ -3,7 +3,6 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-#include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 #include <iostream>
 #include <vector>
@@ -15,21 +14,7 @@
 
 namespace Engine {
 
-struct QueueFamilyIndices {
-    std::optional<uint32_t> graphicsFamily;
-    std::optional<uint32_t> presentFamily;
-    
-    bool isComplete() {
-        return graphicsFamily.has_value() && presentFamily.has_value();
-    }
-};
-
-const std::vector<const char*> deviceExtensions = {
-    "VK_KHR_portability_subset",
-    "VK_KHR_swapchain"
-};
-
-const std::vector<const char*> validationLayers = {
+const std::vector<const char*> validationLayerExtensions = {
     "VK_LAYER_KHRONOS_validation"
 };
 
@@ -63,48 +48,16 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
     }
 }
 
-class Vulkan {
+class ValidationLayers {
 public:
-    Vulkan() {};
+    ValidationLayers() {};
     
-    void initVulkan(const char* appName,
-                    bool enableValidationLayers);
-    void createInstance(const char* appName);
-    void checkInstanceExtensionSupport();
-    void pickPhysicalDevice();
-    bool isDeviceSuitable(VkPhysicalDevice device);
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-    void createLogicalDevice();
-    void createSurface(GLFWwindow* window);
-    
-    //Validation layers
-    void setupDebugMessenger(VkDebugUtilsMessengerCreateInfoEXT* debugMessengerCreateInfo);
     bool checkValidationLayerSupport();
-    void createDebugUtilsMessenger(VkInstance instance,
-                                   const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-                                   const VkAllocationCallbacks* pAllocator,
-                                   VkDebugUtilsMessengerEXT* pDebugMessenger);
-    void destroyDebuUtilsMessenger(VkInstance instance,
-                                   VkDebugUtilsMessengerEXT debugMessenger,
-                                   const VkAllocationCallbacks* pAllocator);
-    void cleanUp();
+    void setupDebugMessenger();
+    void createDebugUtilsMessenger(VkInstance instance, const VkAllocationCallbacks* pAllocator);
+    void destroyDebuUtilsMessenger(VkInstance instance, const VkAllocationCallbacks* pAllocator);
     
-    std::vector<const char*> getGLFWExtensions();
-    
-    ~Vulkan() {};
-    
-private:
-    bool enableValidationLayers = false;
-    
-    VkQueue graphicsQueue = VK_NULL_HANDLE;
-    VkQueue presentQueue = VK_NULL_HANDLE;
-    
-    VkSurfaceKHR surface = VK_NULL_HANDLE;
-    
-    VkInstance instance = VK_NULL_HANDLE;
-    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VkDevice logicalDevice = VK_NULL_HANDLE;
+    ~ValidationLayers() {};
     
     VkDebugUtilsMessengerEXT debugMessenger;
     VkDebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Window.hpp"
-#include "Vulkan_Init.hpp"
+#include "VulkanManager.hpp"
 
 namespace Engine {
     
@@ -16,7 +16,10 @@ public:
     void mainLoop();
     void cleanUp();
     
-    ~Application() {};
+    ~Application() {
+        pWindow = nullptr;
+        pVulkan = nullptr;
+    };
     
 private:
     Window* pWindow = nullptr;

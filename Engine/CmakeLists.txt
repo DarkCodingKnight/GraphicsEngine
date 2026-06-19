@@ -8,13 +8,20 @@ set(CMAKE_CXX_STANDARD 17)
 set(ENGINE_PRIVATE_INCLUDES
 	includes/Application.hpp
 	includes/Window.hpp
-	includes/Vulkan_Init.hpp
+	includes/VulkanManager.hpp
+	includes/SwapChain.hpp
+	includes/ValidationLayers.hpp
+	includes/VulkanResources.hpp
+	includes/VulkanData.hpp
 )
 
 set(ENGINE_PRIVATE_SOURCES
 	src/Application.cpp
 	src/Window.cpp
-	src/Vulkan_Init.cpp
+	src/VulkanManager.cpp
+	src/SwapChain.cpp
+	src/ValidationLayers.cpp
+	src/VulkanResources.cpp
 )
 
 set(PROJECT_INCLUDES_SOURCES

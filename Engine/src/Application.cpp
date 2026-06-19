@@ -12,12 +12,9 @@ int Application::Start(int windowWidth,
     pWindow = &window;
     pWindow->initWindow(windowWidth, windowHeight, windowTitle);
     
-    Vulkan vulkan = Vulkan();
+    Vulkan vulkan = Vulkan(enableValidationLayers, pWindow->getWindowPtr());
     pVulkan = &vulkan;
-    pVulkan->initVulkan(windowTitle, enableValidationLayers);
-    pVulkan->createSurface(pWindow->getWindowPtr());
-    pVulkan->pickPhysicalDevice();
-    pVulkan->createLogicalDevice();
+    pVulkan->createApplication(windowTitle);
     
     mainLoop();
     cleanUp();

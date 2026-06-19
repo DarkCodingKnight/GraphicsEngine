@@ -20,7 +20,7 @@ public:
     
     GLFWwindow* getWindowPtr() { return pGLFWWindow; };
     
-    ~Window() {};
+    ~Window() { pGLFWWindow = nullptr; };
     
 private:
     GLFWwindow* pGLFWWindow = nullptr;
