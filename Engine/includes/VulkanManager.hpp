@@ -6,6 +6,9 @@
 
 #include "VulkanResources.hpp"
 #include "SwapChain.hpp"
+#include "ResourceManager.hpp"
+#include "Renderer.hpp"
+#include "Pipeline.hpp"
 
 namespace Engine {
 
@@ -21,6 +24,9 @@ public:
 private:
     VulkanResources vulkanResources;
     SwapChain swapChain;
+    ResourceManager resourceManager;
+    Renderer renderer;
+    Pipeline pipeline;
     
     GLFWwindow* pGLFWwindow = nullptr;
     

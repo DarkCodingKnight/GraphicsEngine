@@ -9,15 +9,17 @@ class SwapChain {
 public:
     SwapChain(GLFWwindow* pWindow) : pGLFWindow(pWindow) {};
 
-    void createSwapChain(VkDevice& logicalDevice,
-                         VkPhysicalDevice& physicalDevice,
-                         VkSurfaceKHR& surface);
+    void createSwapChain(const VkDevice& logicalDevice,
+                         const VkPhysicalDevice& physicalDevice,
+                         const VkSurfaceKHR& surface);
+    const VkExtent2D& getSwapChainExtent() { return swapChainImageExtent; };
+    const VkFormat& getSwapChainImageFormat() { return swapChainImageFormat; };
     VkSurfaceFormatKHR chooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
-    void getSwapChainImages(VkDevice& device, uint32_t* imageCount);
-    void createImageViews(VkDevice& device);
-    void cleanUp(VkDevice& device);
+    void getSwapChainImages(const VkDevice& device, uint32_t* imageCount);
+    void createImageViews(const VkDevice& device);
+    void cleanUp(const VkDevice& device);
 
     ~SwapChain() { pGLFWindow = nullptr; };
 

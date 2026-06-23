@@ -13,6 +13,9 @@ set(ENGINE_PRIVATE_INCLUDES
 	includes/ValidationLayers.hpp
 	includes/VulkanResources.hpp
 	includes/VulkanData.hpp
+	includes/Pipeline.hpp
+	includes/ResourceManager.hpp
+	includes/Renderer.hpp
 )
 
 set(ENGINE_PRIVATE_SOURCES
@@ -22,6 +25,9 @@ set(ENGINE_PRIVATE_SOURCES
 	src/SwapChain.cpp
 	src/ValidationLayers.cpp
 	src/VulkanResources.cpp
+	src/Pipeline.cpp
+	src/ResourceManager.cpp
+	src/Renderer.cpp
 )
 
 set(PROJECT_INCLUDES_SOURCES
@@ -46,8 +52,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC glm
 include_directories(${PROJECT_NAME} external/stb_image)
 
 #-------------------Vulkan init--------------
-
-
 
 find_package(Vulkan REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})

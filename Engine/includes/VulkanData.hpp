@@ -25,7 +25,7 @@ struct QueueFamilyIndices {
     }
 };
 
-static SwapChainSupportDetails getSwapChainSupport(VkPhysicalDevice& device, VkSurfaceKHR& surface) {
+static SwapChainSupportDetails getSwapChainSupport(const VkPhysicalDevice& device, const VkSurfaceKHR& surface) {
     SwapChainSupportDetails swapChainDetails{};
     
     //Surface capabilities.
@@ -53,7 +53,7 @@ static SwapChainSupportDetails getSwapChainSupport(VkPhysicalDevice& device, VkS
     return swapChainDetails;
 }
 
-static QueueFamilyIndices findQueueFamilies(VkPhysicalDevice& device, VkSurfaceKHR& surface) {
+static QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, const VkSurfaceKHR& surface) {
     QueueFamilyIndices indices;
     
     uint32_t queueFamilyCount = 0;

@@ -2,9 +2,9 @@
 
 namespace Engine {
 
-void SwapChain::createSwapChain(VkDevice& logicalDevice,
-                                VkPhysicalDevice& physicalDevice,
-                                VkSurfaceKHR& surface) {
+void SwapChain::createSwapChain(const VkDevice& logicalDevice,
+                                const VkPhysicalDevice& physicalDevice,
+                                const VkSurfaceKHR& surface) {
     SwapChainSupportDetails swapChainSupport = getSwapChainSupport(physicalDevice, surface);
     
     VkSurfaceFormatKHR surfaceFormat = chooseSurfaceFormat(swapChainSupport.formats);
@@ -57,7 +57,7 @@ void SwapChain::createSwapChain(VkDevice& logicalDevice,
     getSwapChainImages(logicalDevice, &imageCount);
 }
 
-void SwapChain::getSwapChainImages(VkDevice& device, uint32_t* imageCount) {
+void SwapChain::getSwapChainImages(const VkDevice& device, uint32_t* imageCount) {
     vkGetSwapchainImagesKHR(device, swapChain, imageCount, nullptr);
     swapChainImages.resize(*imageCount);
     vkGetSwapchainImagesKHR(device, swapChain, imageCount, swapChainImages.data());
@@ -101,7 +101,7 @@ VkExtent2D SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilit
     }
 }
 
-void SwapChain::createImageViews(VkDevice& device) {
+void SwapChain::createImageViews(const VkDevice& device) {
     swapChainImageViews.resize(swapChainImages.size());
     
     for (int i = 0; i < swapChainImages.size(); i++) {
@@ -136,7 +136,7 @@ void SwapChain::createImageViews(VkDevice& device) {
     
 }
 
-void SwapChain::cleanUp(VkDevice& device) {
+void SwapChain::cleanUp(const VkDevice& device) {
     for (int i = 0; i < swapChainImageViews.size(); i++) {
         vkDestroyImageView(device, swapChainImageViews.at(i), nullptr);
         std::string message = "Image view " + std::to_string(i + 1) + " was destroyed!";
