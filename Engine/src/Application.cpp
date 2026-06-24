@@ -23,6 +23,7 @@ int Application::Start(int windowWidth,
 void Application::mainLoop() {
     while(!(pWindow->isWindowClose())) {
         glfwPollEvents();
+        pVulkan->drawFrame();
     }
 }
 

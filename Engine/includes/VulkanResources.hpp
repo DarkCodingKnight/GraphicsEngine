@@ -27,9 +27,11 @@ public:
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     std::vector<const char*> getGLFWExtensions();
     
-    VkDevice& getLogicalDevice() { return logicalDevice; };
-    VkPhysicalDevice& getPhysicalDevice() { return physicalDevice; };
-    VkSurfaceKHR& getSurface() { return surface; };
+    const VkDevice& getLogicalDevice() { return logicalDevice; };
+    const VkPhysicalDevice& getPhysicalDevice() { return physicalDevice; };
+    const VkSurfaceKHR& getSurface() { return surface; };
+    const VkQueue& getGraphicsQueue() { return graphicsQueue; };
+    const VkQueue& getPresentQueue() { return presentQueue; };
     
     void cleanUp();
     

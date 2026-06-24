@@ -40,11 +40,24 @@ void Vulkan::createApplication(const char* appName) {
     
     pipeline = Pipeline();
     pipeline.createGraphicsPipeline(vulkanResources.getLogicalDevice(), renderer.getRenderPass(), vertCode, fragCode, swapChain.getSwapChainExtent());
+    renderer.createFramebuffers(vulkanResources.getLogicalDevice(), swapChain.getSwapChainImageViews(), swapChain.getSwapChainExtent());
+    renderer.createCommandPool(vulkanResources.getLogicalDevice(), vulkanResources.getPhysicalDevice(), vulkanResources.getSurface());
+    renderer.createCommandBuffer(vulkanResources.getLogicalDevice());
+    renderer.createSyncObjects(vulkanResources.getLogicalDevice());
+}
+
+void Vulkan::drawFrame() {
+    renderer.drawFrame(vulkanResources.getLogicalDevice(),
+                       swapChain.getSwapChain(),
+                       pipeline.getPipeline(),
+                       swapChain.getSwapChainExtent(),
+                       vulkanResources.getGraphicsQueue(),
+                       vulkanResources.getPresentQueue());
 }
 
 void Vulkan::cleanUp() {
-    pipeline.cleanUp(vulkanResources.getLogicalDevice());
     renderer.cleanUp(vulkanResources.getLogicalDevice());
+    pipeline.cleanUp(vulkanResources.getLogicalDevice());
     swapChain.cleanUp(vulkanResources.getLogicalDevice());
     vulkanResources.cleanUp();
 }

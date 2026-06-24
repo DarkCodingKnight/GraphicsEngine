@@ -17,6 +17,7 @@ public:
     Vulkan(bool enableValidationLayers, GLFWwindow* pGLFWwindow);
     
     void createApplication(const char* appName);
+    void drawFrame();
     void cleanUp();
     
     ~Vulkan() { pGLFWwindow = nullptr; };

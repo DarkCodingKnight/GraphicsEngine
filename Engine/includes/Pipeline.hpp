@@ -20,6 +20,7 @@ public:
                                 const std::vector<char>& fragShaderCode,
                                 const VkExtent2D& swapChainExtent);
     VkShaderModule createShaderModule(const VkDevice& device, const std::vector<char>& shaderCode);
+    const VkPipeline& getPipeline() { return graphicsPipeline; };
     void cleanUp(const VkDevice& device);
     
     ~Pipeline() {};
