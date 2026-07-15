@@ -215,7 +215,7 @@ void VulkanResources::createLogicalDevice() {
     vkGetDeviceQueue(logicalDevice, indices.presentFamily.value(), 0, &presentQueue);
 }
 
-void VulkanResources::cleanUp() {
+VulkanResources::~VulkanResources() {
     vkDestroyDevice(logicalDevice, nullptr);
     ConsoleText::printGreen("Logical device was Destroyed!", "Vulkan");
     

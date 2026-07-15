@@ -3,31 +3,31 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <vector>
 
 #include "ConsoleText.hpp"
+#include "SwapChain.hpp"
+#include "Mesh.hpp"
 
 namespace Engine {
 
 class Pipeline {
 public:
-    Pipeline() {};
+    Pipeline() = delete;
+    Pipeline(APImanager* pManager, GLFWwindow* pGLFWwndow, const std::vector<char> vertCode, const std::vector<char> fragCode);
     
-    void createGraphicsPipeline(const VkDevice& device,
-                                const VkRenderPass& renderPass,
-                                const std::vector<char>& vertShaderCode,
-                                const std::vector<char>& fragShaderCode,
-                                const VkExtent2D& swapChainExtent);
     VkShaderModule createShaderModule(const VkDevice& device, const std::vector<char>& shaderCode);
     const VkPipeline& getPipeline() { return graphicsPipeline; };
-    void cleanUp(const VkDevice& device);
+    SwapChain* getSwapChain() { return pSwapChain; };
     
-    ~Pipeline() {};
+    ~Pipeline();
     
 private:
+    VkShaderModule createShaderModule(const std::vector<char>& shaderCode);
+    
     VkPipelineDynamicStateCreateInfo createDynamicState(const std::vector<VkDynamicState>& dynamicStates);
-    VkPipelineVertexInputStateCreateInfo createVertexInput();
     VkPipelineInputAssemblyStateCreateInfo createPipelineInputAssemble();
     VkPipelineViewportStateCreateInfo createViewportState(const VkViewport* viewport, const VkRect2D* scissor);
     VkViewport initViewport(const VkExtent2D& swapChainExtent);
@@ -40,6 +40,9 @@ private:
     
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
+    
+    APImanager* pAPImanager = nullptr;
+    SwapChain* pSwapChain = nullptr;
 };
 
 }

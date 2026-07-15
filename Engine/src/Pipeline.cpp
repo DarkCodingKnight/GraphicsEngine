@@ -2,13 +2,17 @@
 
 namespace Engine {
 
-void Pipeline::createGraphicsPipeline(const VkDevice& device,
-                                      const VkRenderPass& renderPass,
-                                      const std::vector<char>& vertShaderCode,
-                                      const std::vector<char>& fragShaderCode,
-                                      const VkExtent2D& swapChainExtent)
+Pipeline::Pipeline(APImanager* pManager, GLFWwindow* pGLFWwndow, const std::vector<char> vertCode, const std::vector<char> fragCode) :
+pAPImanager(pManager)
 {
-    VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
+    pSwapChain = new SwapChain(pAPImanager, pGLFWwndow);
+    
+    pSwapChain->createSwapChain();
+    pSwapChain->createImageViews();
+    pSwapChain->createRenderPass();
+    pSwapChain->createFramebuffers();
+    
+    VkShaderModule vertShaderModule = createShaderModule(vertCode);
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     if (vertShaderModule != NULL) {
         vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -17,7 +21,7 @@ void Pipeline::createGraphicsPipeline(const VkDevice& device,
         vertShaderStageInfo.pName = "main";
     }
     
-    VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
+    VkShaderModule fragShaderModule = createShaderModule(fragCode);
     VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
     if (fragShaderModule != NULL) {
         fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -31,23 +35,35 @@ void Pipeline::createGraphicsPipeline(const VkDevice& device,
     std::vector<VkDynamicState> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
     
     VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo = createDynamicState(dynamicStates);
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo = createVertexInput();
     VkPipelineInputAssemblyStateCreateInfo pipelineInputAssembleCreateInfo = createPipelineInputAssemble();
-    VkViewport viewport = initViewport(swapChainExtent);
-    VkRect2D scissor = initScissor(swapChainExtent);
+    VkViewport viewport = initViewport(pSwapChain->getSwapChainExtent());
+    VkRect2D scissor = initScissor(pSwapChain->getSwapChainExtent());
     VkPipelineViewportStateCreateInfo viewportStateCreateInfo = createViewportState(&viewport, &scissor);
     VkPipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = createRasterizationStage();
     VkPipelineMultisampleStateCreateInfo multisampleStateCreateInfo = createMultisamplingStage();
     VkPipelineColorBlendAttachmentState colorBlendAttachmentState = initColorBlendAttachmentState();
     VkPipelineColorBlendStateCreateInfo colorBlendCreateInfo = createColorBlendState(&colorBlendAttachmentState);
     
-    createPipelineLayout(device);
+    createPipelineLayout(pAPImanager->getVulkanResources()->getLogicalDevice());
     
     VkGraphicsPipelineCreateInfo pipelineCreateInfo{};
     pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineCreateInfo.stageCount = 2;
     pipelineCreateInfo.pStages = shaderStages;
+    
+    // binding buffers
+    auto bindingDescription = Vertex::getBindingDescription();
+    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+    
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    
     pipelineCreateInfo.pVertexInputState = &vertexInputInfo;
+    
     pipelineCreateInfo.pInputAssemblyState = &pipelineInputAssembleCreateInfo;
     pipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
     pipelineCreateInfo.pRasterizationState = &rasterizationStateCreateInfo;
@@ -56,18 +72,18 @@ void Pipeline::createGraphicsPipeline(const VkDevice& device,
     pipelineCreateInfo.pColorBlendState = &colorBlendCreateInfo;
     pipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
     pipelineCreateInfo.layout = pipelineLayout;
-    pipelineCreateInfo.renderPass = renderPass;
+    pipelineCreateInfo.renderPass = pSwapChain->getSwapChainRenderPass();
     pipelineCreateInfo.subpass = 0;
     //pipelineCreateInfo.flags = VK_PIPELINE_CREATE_DERIVATIVE_BIT; // if you want to inherit pipeline
     pipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineCreateInfo.basePipelineIndex = -1;
     
-    if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+    if (vkCreateGraphicsPipelines(pAPImanager->getVulkanResources()->getLogicalDevice(), VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
         ConsoleText::printError("Failed to create graphics pipeline!", "Pipeline");
         
-        vkDestroyShaderModule(device, vertShaderModule, nullptr);
+        vkDestroyShaderModule(pAPImanager->getVulkanResources()->getLogicalDevice(), vertShaderModule, nullptr);
         ConsoleText::printGreen("Shader module was destroyed!", "Pipeline");
-        vkDestroyShaderModule(device, fragShaderModule, nullptr);
+        vkDestroyShaderModule(pAPImanager->getVulkanResources()->getLogicalDevice(), fragShaderModule, nullptr);
         ConsoleText::printGreen("Shader module was destroyed!", "Pipeline");
         
         std::exit(0);
@@ -76,10 +92,28 @@ void Pipeline::createGraphicsPipeline(const VkDevice& device,
         ConsoleText::printGreen("Graphics pipeline was created!", "Pipeline");
     }
     
-    vkDestroyShaderModule(device, vertShaderModule, nullptr);
+    vkDestroyShaderModule(pAPImanager->getVulkanResources()->getLogicalDevice(), vertShaderModule, nullptr);
     ConsoleText::printGreen("Shader module was destroyed!", "Pipeline");
-    vkDestroyShaderModule(device, fragShaderModule, nullptr);
+    vkDestroyShaderModule(pAPImanager->getVulkanResources()->getLogicalDevice(), fragShaderModule, nullptr);
     ConsoleText::printGreen("Shader module was destroyed!", "Pipeline");
+    
+    
+}
+
+VkShaderModule Pipeline::createShaderModule(const std::vector<char>& shaderCode) {
+    VkShaderModuleCreateInfo shaderModuleCreateInfo{};
+    shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    shaderModuleCreateInfo.codeSize = shaderCode.size();
+    shaderModuleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(shaderCode.data());
+    VkShaderModule shaderModule;
+    
+    if (vkCreateShaderModule(pAPImanager->getVulkanResources()->getLogicalDevice(), &shaderModuleCreateInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+        ConsoleText::printError("Failed to create shader program!", "Pipeline");
+    }
+    else {
+        ConsoleText::printGreen("Shader programm was created!", "Pipeline");
+    }
+    return shaderModule;
 }
 
 VkPipelineDynamicStateCreateInfo Pipeline::createDynamicState(const std::vector<VkDynamicState>& dynamicStates) {
@@ -89,17 +123,6 @@ VkPipelineDynamicStateCreateInfo Pipeline::createDynamicState(const std::vector<
     dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
     
     return dynamicStateCreateInfo;
-}
-
-VkPipelineVertexInputStateCreateInfo Pipeline::createVertexInput() {
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = nullptr;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexAttributeDescriptions = nullptr;
-    
-    return vertexInputInfo;
 }
 
 VkPipelineInputAssemblyStateCreateInfo Pipeline::createPipelineInputAssemble() {
@@ -213,22 +236,6 @@ VkPipelineViewportStateCreateInfo Pipeline::createViewportState(const VkViewport
     return viewportStateCreateInfo;
 }
 
-VkShaderModule Pipeline::createShaderModule(const VkDevice& device, const std::vector<char>& shaderCode) {
-    VkShaderModuleCreateInfo shaderModuleCreateInfo{};
-    shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    shaderModuleCreateInfo.codeSize = shaderCode.size();
-    shaderModuleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(shaderCode.data());
-    VkShaderModule shaderModule;
-    
-    if (vkCreateShaderModule(device, &shaderModuleCreateInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-        ConsoleText::printError("Failed to create shader program!", "Pipeline");
-    }
-    else {
-        ConsoleText::printGreen("Shader programm was created!", "Pipeline");
-    }
-    return shaderModule;
-}
-
 void Pipeline::createPipelineLayout(const VkDevice& device) {
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -246,11 +253,15 @@ void Pipeline::createPipelineLayout(const VkDevice& device) {
     }
 }
 
-void Pipeline::cleanUp(const VkDevice& device) {
-    vkDestroyPipeline(device, graphicsPipeline, nullptr);
+Pipeline::~Pipeline() {
+    delete pSwapChain;
+    
+    vkDestroyPipeline(pAPImanager->getVulkanResources()->getLogicalDevice(), graphicsPipeline, nullptr);
     ConsoleText::printGreen("Pipeline was destroyed!", "Pipeline");
-    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+    vkDestroyPipelineLayout(pAPImanager->getVulkanResources()->getLogicalDevice(), pipelineLayout, nullptr);
     ConsoleText::printGreen("Pipeline layout was destroyed!", "Pipeline");
+    
+    pAPImanager = nullptr;
 }
 
 }

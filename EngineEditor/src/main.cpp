@@ -1,8 +1,8 @@
 //#define RELEASE
 
-#include "iostream"
+#include <iostream>
 
-#include "Application.hpp"
+#include "ObjectPool.hpp"
 #include "ConsoleText.hpp"
 
 #ifdef RELEASE
@@ -18,19 +18,50 @@ public:
     Editor() {};
     
     void StartEngine() {
-        application.Start(WINDOW_WIDTH,
-                          WINDOW_HEIGHT,
-                          TITLE,
-                          enableValidationLayers);
+        pGraphicsApplication = new Engine::GraphicsApplication(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
+        pObjectPool = new Engine::ObjectPool(pGraphicsApplication,
+                                             TITLE,
+                                             enableValidationLayers,
+                                             MAX_FRAMES_IN_FLIGHT,
+                                             vertexPath,
+                                             fragmentPath);
+        
+        std::vector<Engine::Vertex> vertices = {
+            {{ 0.0f, -0.5f }, { 1.0f, 1.0f, 1.0f }},
+            {{ 0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f }},
+            {{-0.5f,  0.5f }, { 0.0f, 0.0f, 1.0f }}
+        };
+        
+        pObjectPool->createObject(vertices);
+        
+        mainLoop();
+        
+        clenup();
     }
+    
+    void mainLoop() {
+        while(pObjectPool->updateObjects()) {};
+    }
+    
+    void clenup() {
+        delete pObjectPool;
+        delete pGraphicsApplication;
+    }
+    
     ~Editor() {};
     
 private:
-    Engine::Application application;
+    Engine::GraphicsApplication* pGraphicsApplication;
+    Engine::ObjectPool* pObjectPool;
     
+    const int MAX_FRAMES_IN_FLIGHT = 2;
     const int WINDOW_WIDTH = 500;
     const int WINDOW_HEIGHT = 500;
     const char* TITLE = "GLFW window";
+    const std::string vertexPath = "/Users/user/Projects/GraphicsEngine/Engine/shaders/vert.spv";
+    const std::string fragmentPath = "/Users/user/Projects/GraphicsEngine/Engine/shaders/frag.spv";
+    //"/../../../GraphicsEngine/Engine/shaders/vert.spv"
+    //"/../../../GraphicsEngine/Engine/shaders/frag.spv"
 };
 
 }
@@ -41,7 +72,8 @@ int main() {
     try {
         editor.StartEngine();
     } catch (const std::exception& e) {
-        ConsoleText::printError("Engine error!", "Engine editor");
+        std::string message = "Engine error! " + static_cast<std::string>(e.what());
+        ConsoleText::printError(message, "Engine editor");
         return EXIT_FAILURE;
     }
     

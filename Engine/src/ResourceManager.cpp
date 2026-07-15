@@ -7,7 +7,7 @@ std::optional<std::vector<char>> ResourceManager::readFile(const std::string& fi
     
     if(!file.is_open()) {
         ConsoleText::printError("Failed to open file!", "Resource manager");
-        return;
+        std::exit(0);
     }
     else {
         ConsoleText::printGreen("File was opened!", "Resource manager");

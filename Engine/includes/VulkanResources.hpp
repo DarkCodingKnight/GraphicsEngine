@@ -33,9 +33,7 @@ public:
     const VkQueue& getGraphicsQueue() { return graphicsQueue; };
     const VkQueue& getPresentQueue() { return presentQueue; };
     
-    void cleanUp();
-    
-    ~VulkanResources() {};
+    ~VulkanResources();
     
 private:
     VkQueue graphicsQueue = VK_NULL_HANDLE;

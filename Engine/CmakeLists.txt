@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 #--------------PROJECT FILES--------------
 
 set(ENGINE_PRIVATE_INCLUDES
-	includes/Application.hpp
+	includes/GraphicsApplication.hpp
 	includes/Window.hpp
-	includes/VulkanManager.hpp
+	includes/APImanager.hpp
 	includes/SwapChain.hpp
 	includes/ValidationLayers.hpp
 	includes/VulkanResources.hpp
@@ -16,18 +16,24 @@ set(ENGINE_PRIVATE_INCLUDES
 	includes/Pipeline.hpp
 	includes/ResourceManager.hpp
 	includes/Renderer.hpp
+	includes/Object.hpp
+	includes/ObjectPool.hpp
+	includes/Mesh.hpp
 )
 
 set(ENGINE_PRIVATE_SOURCES
-	src/Application.cpp
+	src/GraphicsApplication.cpp
 	src/Window.cpp
-	src/VulkanManager.cpp
+	src/APImanager.cpp
 	src/SwapChain.cpp
 	src/ValidationLayers.cpp
 	src/VulkanResources.cpp
 	src/Pipeline.cpp
 	src/ResourceManager.cpp
 	src/Renderer.cpp
+	src/Object.cpp
+	src/ObjectPool.cpp
+	src/Mesh.cpp
 )
 
 set(PROJECT_INCLUDES_SOURCES

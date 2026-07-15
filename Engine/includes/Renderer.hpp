@@ -6,50 +6,62 @@
 #include <iostream>
 #include <vector>
 
+#include "APImanager.hpp"
 #include "ConsoleText.hpp"
-#include "VulkanData.hpp"
+#include "Window.hpp"
+#include "Pipeline.hpp"
+#include "Mesh.hpp"
 
 namespace Engine {
 
-class Renderer {
+class Renderer : public WindowInterface
+{
 public:
-    Renderer() {};
+    Renderer() = delete;
+    Renderer(APImanager* pManager,
+             const int max_frames_in_flight,
+             GLFWwindow* const pWindow) :
+    pAPImanager(pManager)
+    {
+        if (max_frames_in_flight == 0) std::exit(0);
+        else this->max_frames_in_flight = max_frames_in_flight;
+        
+        createCommandPool();
+        createCommandBuffers();
+        createSyncObjects();
+    };
     
-    void createRenderPass(const VkDevice& device, const VkFormat& swapChainImageFormat);
-    const VkRenderPass& getRenderPass() { return renderPass; };
-    void cleanUp(const VkDevice& device);
+    void initRenderer(const std::vector<char>& vertShaderCode,
+                      const std::vector<char>& fragShaderCode);
     
-    void createFramebuffers(const VkDevice& device,
-                            const std::vector<VkImageView>& swapChainImageViews,
-                            const VkExtent2D& swapChainImageExtent);
-    void createCommandPool(const VkDevice& logicalDevice,
-                           const VkPhysicalDevice& physicalDevice,
-                           const VkSurfaceKHR& surface);
-    void createCommandBuffer(const VkDevice& device);
-    void recordCommandBuffer(const VkCommandBuffer& cBuffer,
+    void recordCommandBuffer(Pipeline* pPipeline,
+                             Mesh* pMesh,
+                             const VkCommandBuffer& cBuffer,
                              const VkPipeline& pipeline,
-                             uint32_t imageIndex,
-                             const VkExtent2D& swapChainImageExtent);
+                             uint32_t imageIndex);
     
-    void drawFrame(const VkDevice& device,
-                   const VkSwapchainKHR& swapChain,
-                   const VkPipeline& pipeline,
-                   const VkExtent2D& swapChainImageExtent,
-                   const VkQueue& graphicsQueue,
-                   const VkQueue& presentQueue);
-    void createSyncObjects(const VkDevice& device);
+    void drawFrame(Pipeline* pPipeline, Mesh* pMesh);
+    void updateWindow() override;
     
-    ~Renderer() {};
+    ~Renderer();
     
 private:
-    VkRenderPass renderPass;
-    std::vector<VkFramebuffer> swapChainFramebuffers;
-    VkCommandPool commandPool;
-    VkCommandBuffer commandBuffer;
+    void createCommandPool();
+    void createCommandBuffers();
+    void createSyncObjects();
     
-    VkSemaphore imageAvailableSemaphore;
-    VkSemaphore renderFinishedSemaphore;
-    VkFence inFlightFence;
+    APImanager* pAPImanager = nullptr;
+    
+    VkCommandPool commandPool;
+    std::vector<VkCommandBuffer> commandBuffers;
+    
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+    std::vector<VkFence> inFlightFences;
+    
+    bool framebufferResized = false;
+    int max_frames_in_flight = 0;
+    uint32_t currentFrame = 0;
 };
 
 }

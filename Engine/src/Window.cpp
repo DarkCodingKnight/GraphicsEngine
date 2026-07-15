@@ -4,7 +4,7 @@
 
 namespace Engine {
 
-void Window::initWindow(int width, int height, const char* title) {
+Window::Window(int width, int height, const char* title) {
     if (!glfwInit()) {
         ConsoleText::printError("glfw init error", "Window");
         std::exit(0);
@@ -31,6 +31,14 @@ void Window::initWindow(int width, int height, const char* title) {
         ConsoleText::printGreen(glfwVersion, "Window");
     }
     else ConsoleText::printError("GLFW have not vulkan support!", "Window");
+    
+    glfwSetWindowUserPointer(pGLFWWindow, this);
+    
+    glfwSetFramebufferSizeCallback(pGLFWWindow, framebufferResizeCallback);
+}
+
+void Window::setUpdateObjects(WindowInterface* pUpdateObject) {
+    pUpdateObjects.push_back(pUpdateObject);
 }
 
 int Window::isWindowClose() {
@@ -38,7 +46,7 @@ int Window::isWindowClose() {
 }
 
 void Window::destroyWindow() {
-    ConsoleText::printGreen("Window was destroyed", "Window");
+    ConsoleText::printGreen("Window was destroyed!", "Window");
     glfwTerminate();
 }
 
