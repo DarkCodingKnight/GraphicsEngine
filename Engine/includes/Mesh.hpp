@@ -1,8 +1,10 @@
 #pragma once
 
 #include <array>
+#include <glm/glm.hpp>
 
 #include "Pipeline.hpp"
+#include "VulkanData.hpp"
 
 namespace Engine {
 
@@ -38,16 +40,21 @@ struct Vertex {
 class Mesh {
 public:
     Mesh() = delete;
-    Mesh(APImanager* pManager, const std::vector<Vertex>& vert) : pAPImanager(pManager), vertices(vert) {};
+    Mesh(APImanager* pManager,
+         const VkCommandPool& commandPool,
+         const std::vector<Vertex>& vert);
     
-    void createVertexBuffer();
     size_t getVerticesSize() { return vertices.size(); };
     VkBuffer& getBuffer() { return vertexBuffer; };
     
     ~Mesh();
     
 private:
-    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    void createVertexBuffer(const VkCommandPool& commandPool);
+    void copyBuffer(VkBuffer srcBuffer,
+                    VkBuffer dstBuffer,
+                    VkDeviceSize size,
+                    const VkCommandPool& commandPool);
     
     APImanager* pAPImanager = nullptr;
     std::vector<Vertex> vertices;

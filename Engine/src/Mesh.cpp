@@ -2,66 +2,87 @@
 
 namespace Engine {
 
-void Mesh::createVertexBuffer() {
+Mesh::Mesh(APImanager* pManager,
+     const VkCommandPool& commandPool,
+     const std::vector<Vertex>& vert) :
+pAPImanager(pManager), vertices(vert)
+{
+    createVertexBuffer(commandPool);
+};
+
+void Mesh::createVertexBuffer(const VkCommandPool& commandPool) {
+    VkDeviceSize bufferSize = sizeof(vertices.at(0)) * vertices.size();
     
-    // создем буффер
-    VkBufferCreateInfo bufferInfo{};
-    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferInfo.size = sizeof(vertices[0]) * vertices.size();
-    bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
     
-    if (vkCreateBuffer(pAPImanager->getVulkanResources()->getLogicalDevice(), &bufferInfo, nullptr, &vertexBuffer) != VK_SUCCESS)
-    {
-        ConsoleText::printError("Failed to create vertex buffer!", "Render program");
-        std::exit(0);
-    }
-    else ConsoleText::printGreen("Vertex buffer was created!", "Render program");
+    createBuffer(pAPImanager->getVulkanResources()->getLogicalDevice(),
+                 pAPImanager->getVulkanResources()->getPhysicalDevice(),
+                 bufferSize,
+                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                 stagingBuffer,
+                 stagingBufferMemory);
     
-    
-    // выделяем память и биндим буффер
-    VkMemoryRequirements memRequirnaments;
-    vkGetBufferMemoryRequirements(pAPImanager->getVulkanResources()->getLogicalDevice(), vertexBuffer, &memRequirnaments);
-    
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirnaments.size;
-    allocInfo.memoryTypeIndex = findMemoryType(memRequirnaments.memoryTypeBits,
-                                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    
-    if (vkAllocateMemory(pAPImanager->getVulkanResources()->getLogicalDevice(),
-                         &allocInfo,
-                         nullptr,
-                         &vertexBufferMemory) != VK_SUCCESS) {
-        ConsoleText::printError("Failed to allocate vertex buffer memory!", "Render program");
-        std::exit(0);
-    }
-    else ConsoleText::printGreen("Buffer memory was allocated!", "Render program");
-    
-    vkBindBufferMemory(pAPImanager->getVulkanResources()->getLogicalDevice(),
-                       vertexBuffer,
-                       vertexBufferMemory,
-                       0);
-    
-    
-    // переносим данные на видеокарту
     void* data;
-    vkMapMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), vertexBufferMemory, 0, bufferInfo.size, 0, &data);
-    memcpy(data, vertices.data(), (size_t)bufferInfo.size);
-    vkUnmapMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), vertexBufferMemory);
+    vkMapMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, vertices.data(), (size_t)bufferSize);
+    vkUnmapMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), stagingBufferMemory);
+    
+    
+    createBuffer(pAPImanager->getVulkanResources()->getLogicalDevice(),
+                 pAPImanager->getVulkanResources()->getPhysicalDevice(),
+                 bufferSize,
+                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                 vertexBuffer,
+                 vertexBufferMemory);
+    
+    copyBuffer(stagingBuffer, vertexBuffer, bufferSize, commandPool);
+    
+    vkDestroyBuffer(pAPImanager->getVulkanResources()->getLogicalDevice(), stagingBuffer, nullptr);
+    vkFreeMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), stagingBufferMemory, nullptr);
 }
 
-uint32_t Mesh::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
-    VkPhysicalDeviceMemoryProperties memProperties;
-    vkGetPhysicalDeviceMemoryProperties(pAPImanager->getVulkanResources()->getPhysicalDevice(), &memProperties);
+void Mesh::copyBuffer(VkBuffer srcBuffer,
+                      VkBuffer dstBuffer,
+                      VkDeviceSize size,
+                      const VkCommandPool& commandPool)
+{
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = commandPool;
+    allocInfo.commandBufferCount = 1;
     
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-            return i;
-        }
-    }
-    ConsoleText::printError("Failed to find suitable memory type!", "Render program");
-    std::exit(0);
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(pAPImanager->getVulkanResources()->getLogicalDevice(),
+                             &allocInfo,
+                             &commandBuffer);
+    
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+    
+    VkBufferCopy copyRegion{};
+    copyRegion.srcOffset = 0;
+    copyRegion.dstOffset = 0;
+    copyRegion.size = size;
+    vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+    
+    vkEndCommandBuffer(commandBuffer);
+    
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+    
+    vkQueueSubmit(pAPImanager->getVulkanResources()->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(pAPImanager->getVulkanResources()->getGraphicsQueue());
+    
+    vkFreeCommandBuffers(pAPImanager->getVulkanResources()->getLogicalDevice(), commandPool, 1, &commandBuffer);
 }
 
 Mesh::~Mesh() {

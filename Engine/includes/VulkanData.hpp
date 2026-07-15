@@ -82,4 +82,61 @@ static QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, cons
     return indices;
 }
 
+static uint32_t findMemoryType(const VkPhysicalDevice& device,
+                               uint32_t typeFilter,
+                               VkMemoryPropertyFlags properties)
+{
+    VkPhysicalDeviceMemoryProperties memProperties;
+    vkGetPhysicalDeviceMemoryProperties(device, &memProperties);
+    
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+            return i;
+        }
+    }
+    ConsoleText::printError("Failed to find suitable memory type!", "Render program");
+    std::exit(0);
+}
+
+static void createBuffer(const VkDevice& logicalDevice,
+                         const VkPhysicalDevice& physicalDevice,
+                         VkDeviceSize size,
+                         VkBufferUsageFlags usage,
+                         VkMemoryPropertyFlags properties,
+                         VkBuffer& buffer,
+                         VkDeviceMemory& bufferMemory)
+{
+    VkBufferCreateInfo bufferInfo{};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = size;
+    bufferInfo.usage = usage;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    
+    if (vkCreateBuffer(logicalDevice, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+    {
+        ConsoleText::printError("Failed to create vertex buffer!", "Render program");
+        std::exit(0);
+    }
+    else ConsoleText::printGreen("Vertex buffer was created!", "Render program");
+    
+    
+    VkMemoryRequirements memRequirnaments;
+    vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirnaments);
+    
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirnaments.size;
+    allocInfo.memoryTypeIndex = findMemoryType(physicalDevice,
+                                               memRequirnaments.memoryTypeBits,
+                                               properties);
+    
+    if (vkAllocateMemory(logicalDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
+        ConsoleText::printError("Failed to allocate vertex buffer memory!", "Render program");
+        std::exit(0);
+    }
+    else ConsoleText::printGreen("Buffer memory was allocated!", "Render program");
+    
+    vkBindBufferMemory(logicalDevice, buffer, bufferMemory, 0);
+}
+
 }

@@ -40,6 +40,8 @@ public:
                              const VkPipeline& pipeline,
                              uint32_t imageIndex);
     
+    const VkCommandPool& getCommandPool() { return commandPool; };
+    
     void drawFrame(Pipeline* pPipeline, Mesh* pMesh);
     void updateWindow() override;
     
