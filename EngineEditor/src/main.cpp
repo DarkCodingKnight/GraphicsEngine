@@ -26,13 +26,7 @@ public:
                                              vertexPath,
                                              fragmentPath);
         
-        std::vector<Engine::Vertex> vertices = {
-            {{ 0.0f, -0.5f }, { 1.0f, 1.0f, 1.0f }},
-            {{ 0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f }},
-            {{-0.5f,  0.5f }, { 0.0f, 0.0f, 1.0f }}
-        };
-        
-        pObjectPool->createObject(vertices);
+        pObjectPool->createObject(vertices, indices);
         
         mainLoop();
         
@@ -51,6 +45,7 @@ public:
     ~Editor() {};
     
 private:
+    
     Engine::GraphicsApplication* pGraphicsApplication;
     Engine::ObjectPool* pObjectPool;
     
@@ -58,8 +53,19 @@ private:
     const int WINDOW_WIDTH = 500;
     const int WINDOW_HEIGHT = 500;
     const char* TITLE = "GLFW window";
+    
+    const std::vector<Engine::Vertex> vertices = {
+        {{-0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
+        {{ 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }},
+        {{ 0.5f,  0.5f }, { 0.0f, 0.0f, 1.0f }},
+        {{-0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f }}
+    };
+    
+    const std::vector<uint16_t> indices = { 0, 1, 2, 2, 3, 0 };
+    
     const std::string vertexPath = "/Users/user/Projects/GraphicsEngine/Engine/shaders/vert.spv";
     const std::string fragmentPath = "/Users/user/Projects/GraphicsEngine/Engine/shaders/frag.spv";
+    
     //"/../../../GraphicsEngine/Engine/shaders/vert.spv"
     //"/../../../GraphicsEngine/Engine/shaders/frag.spv"
 };

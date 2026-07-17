@@ -9,7 +9,10 @@ namespace Engine {
 class Object {
 public:
     Object() = delete;
-    Object(APImanager* pManager, Renderer* renderer, const std::vector<Vertex>& vertices);
+    Object(APImanager* pManager,
+           Renderer* renderer,
+           const std::vector<Vertex>& vertices,
+           const std::vector<uint16_t>& indices);
     
     void draw(Pipeline* pPipeline);
     void cleanUp();

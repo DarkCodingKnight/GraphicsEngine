@@ -2,10 +2,13 @@
 
 namespace Engine {
 
-Object::Object(APImanager* pManager, Renderer* renderer, const std::vector<Vertex>& vertices) :
+Object::Object(APImanager* pManager,
+               Renderer* renderer,
+               const std::vector<Vertex>& vertices,
+               const std::vector<uint16_t>& indices) :
 pRenderer(renderer), pAPImanager(pManager)
 {
-    pMesh = new Mesh(pAPImanager, pRenderer->getCommandPool(), vertices);
+    pMesh = new Mesh(pAPImanager, pRenderer->getCommandPool(), vertices, indices);
 }
 
 void Object::draw(Pipeline* pPipeline) {

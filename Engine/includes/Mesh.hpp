@@ -42,15 +42,24 @@ public:
     Mesh() = delete;
     Mesh(APImanager* pManager,
          const VkCommandPool& commandPool,
-         const std::vector<Vertex>& vert);
+         const std::vector<Vertex>& vert,
+         const std::vector<uint16_t>& ind);
     
     size_t getVerticesSize() { return vertices.size(); };
-    VkBuffer& getBuffer() { return vertexBuffer; };
+    size_t getIndicesSize() { return indices.size(); };
+    VkBuffer* getVertexBufferPointer() { return &vertexBuffer; };
+    VkBuffer* getIndexBufferPointer() { return &indexBuffer; };
     
     ~Mesh();
     
 private:
-    void createVertexBuffer(const VkCommandPool& commandPool);
+    template<typename T>
+    void createBuffer(const T* dataArray,
+                      const VkDeviceSize bufferSize,
+                      const VkCommandPool commandPool,
+                      VkBufferUsageFlagBits bufferUsageBit,
+                      VkBuffer& dstBuffer);
+    
     void copyBuffer(VkBuffer srcBuffer,
                     VkBuffer dstBuffer,
                     VkDeviceSize size,
@@ -58,9 +67,12 @@ private:
     
     APImanager* pAPImanager = nullptr;
     std::vector<Vertex> vertices;
+    std::vector<uint16_t> indices;
     
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
 };
 
 }

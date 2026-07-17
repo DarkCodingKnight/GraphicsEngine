@@ -3,42 +3,50 @@
 namespace Engine {
 
 Mesh::Mesh(APImanager* pManager,
-     const VkCommandPool& commandPool,
-     const std::vector<Vertex>& vert) :
-pAPImanager(pManager), vertices(vert)
+           const VkCommandPool& commandPool,
+           const std::vector<Vertex>& vert,
+           const std::vector<uint16_t>& ind) :
+pAPImanager(pManager), vertices(vert), indices(ind)
 {
-    createVertexBuffer(commandPool);
+    VkDeviceSize vertexBufferSize = sizeof(vertices.at(0)) * vertices.size();
+    createBuffer(vertices.data(), vertexBufferSize, commandPool, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertexBuffer);
+    
+    VkDeviceSize indexBufferSize = sizeof(indices.at(0)) * indices.size();
+    createBuffer(indices.data(), indexBufferSize, commandPool, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, indexBuffer);
 };
 
-void Mesh::createVertexBuffer(const VkCommandPool& commandPool) {
-    VkDeviceSize bufferSize = sizeof(vertices.at(0)) * vertices.size();
-    
+template<typename T>
+void Mesh::createBuffer(const T* dataArray,
+                        const VkDeviceSize bufferSize,
+                        const VkCommandPool commandPool,
+                        VkBufferUsageFlagBits bufferUsageBit,
+                        VkBuffer& dstBuffer)
+{
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
     
-    createBuffer(pAPImanager->getVulkanResources()->getLogicalDevice(),
-                 pAPImanager->getVulkanResources()->getPhysicalDevice(),
-                 bufferSize,
-                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                 stagingBuffer,
-                 stagingBufferMemory);
+    createBufferSource(pAPImanager->getVulkanResources()->getLogicalDevice(),
+                       pAPImanager->getVulkanResources()->getPhysicalDevice(),
+                       bufferSize,
+                       VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                       stagingBuffer,
+                       stagingBufferMemory);
     
     void* data;
     vkMapMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, vertices.data(), (size_t)bufferSize);
+    memcpy(data, dataArray, (size_t)bufferSize);
     vkUnmapMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), stagingBufferMemory);
     
+    createBufferSource(pAPImanager->getVulkanResources()->getLogicalDevice(),
+                       pAPImanager->getVulkanResources()->getPhysicalDevice(),
+                       bufferSize,
+                       VK_BUFFER_USAGE_TRANSFER_DST_BIT | bufferUsageBit,
+                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                       dstBuffer,
+                       vertexBufferMemory);
     
-    createBuffer(pAPImanager->getVulkanResources()->getLogicalDevice(),
-                 pAPImanager->getVulkanResources()->getPhysicalDevice(),
-                 bufferSize,
-                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                 vertexBuffer,
-                 vertexBufferMemory);
-    
-    copyBuffer(stagingBuffer, vertexBuffer, bufferSize, commandPool);
+    copyBuffer(stagingBuffer, dstBuffer, bufferSize, commandPool);
     
     vkDestroyBuffer(pAPImanager->getVulkanResources()->getLogicalDevice(), stagingBuffer, nullptr);
     vkFreeMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), stagingBufferMemory, nullptr);
@@ -86,6 +94,9 @@ void Mesh::copyBuffer(VkBuffer srcBuffer,
 }
 
 Mesh::~Mesh() {
+    vkDestroyBuffer(pAPImanager->getVulkanResources()->getLogicalDevice(), indexBuffer, nullptr);
+    vkFreeMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), indexBufferMemory, nullptr);
+    
     vkDestroyBuffer(pAPImanager->getVulkanResources()->getLogicalDevice(), vertexBuffer, nullptr);
     vkFreeMemory(pAPImanager->getVulkanResources()->getLogicalDevice(), vertexBufferMemory, nullptr);
     

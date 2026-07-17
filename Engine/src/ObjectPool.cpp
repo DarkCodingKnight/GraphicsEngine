@@ -24,7 +24,8 @@ validationLayers(validLayers), max_frames_in_flight(frames_in_flight)
 
 void ObjectPool::initObjectPool(const char* appName,
                                 const std::string& vertexPath,
-                                const std::string& fragmentPath) {
+                                const std::string& fragmentPath)
+{
     pAPImanager = new APImanager(validationLayers,
                                  pGraphicsApplication->getWindowPtr()->getGLFWwindowPtr(),
                                  max_frames_in_flight);
@@ -50,8 +51,10 @@ void ObjectPool::initObjectPool(const char* appName,
                              pGraphicsApplication->getWindowPtr()->getGLFWwindowPtr());
 }
 
-void ObjectPool::createObject(const std::vector<Vertex>& vertices) {
-    Object* pObject = new Object(pAPImanager, pRenderer, vertices);
+void ObjectPool::createObject(const std::vector<Vertex>& vertices,
+                              const std::vector<uint16_t>& indices)
+{
+    Object* pObject = new Object(pAPImanager, pRenderer, vertices, indices);
     
     pObjects.push_back(pObject);
 }
@@ -69,12 +72,12 @@ bool ObjectPool::updateObjects() {
 
 ObjectPool::~ObjectPool() {
     delete pRenderer;
+    delete pPipeline;
     
     for (auto object : pObjects) {
         delete object;
     }
     
-    delete pPipeline;
     delete pAPImanager;
 }
 

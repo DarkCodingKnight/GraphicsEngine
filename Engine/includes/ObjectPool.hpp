@@ -19,7 +19,8 @@ public:
                const std::string& vertexPath,
                const std::string& fragmentPath);
     
-    void createObject(const std::vector<Vertex>& vertices);
+    void createObject(const std::vector<Vertex>& vertices,
+                      const std::vector<uint16_t>& indices);
     bool updateObjects();
     
     ~ObjectPool();

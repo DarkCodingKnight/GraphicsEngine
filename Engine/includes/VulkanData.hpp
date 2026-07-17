@@ -98,13 +98,13 @@ static uint32_t findMemoryType(const VkPhysicalDevice& device,
     std::exit(0);
 }
 
-static void createBuffer(const VkDevice& logicalDevice,
-                         const VkPhysicalDevice& physicalDevice,
-                         VkDeviceSize size,
-                         VkBufferUsageFlags usage,
-                         VkMemoryPropertyFlags properties,
-                         VkBuffer& buffer,
-                         VkDeviceMemory& bufferMemory)
+static void createBufferSource(const VkDevice& logicalDevice,
+                               const VkPhysicalDevice& physicalDevice,
+                               VkDeviceSize size,
+                               VkBufferUsageFlags usage,
+                               VkMemoryPropertyFlags properties,
+                               VkBuffer& buffer,
+                               VkDeviceMemory& bufferMemory)
 {
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -114,10 +114,10 @@ static void createBuffer(const VkDevice& logicalDevice,
     
     if (vkCreateBuffer(logicalDevice, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
     {
-        ConsoleText::printError("Failed to create vertex buffer!", "Render program");
+        ConsoleText::printError("Failed to create buffer!", "Render program");
         std::exit(0);
     }
-    else ConsoleText::printGreen("Vertex buffer was created!", "Render program");
+    else ConsoleText::printGreen("Buffer was created!", "Render program");
     
     
     VkMemoryRequirements memRequirnaments;
@@ -131,7 +131,7 @@ static void createBuffer(const VkDevice& logicalDevice,
                                                properties);
     
     if (vkAllocateMemory(logicalDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-        ConsoleText::printError("Failed to allocate vertex buffer memory!", "Render program");
+        ConsoleText::printError("Failed to allocate buffer memory!", "Render program");
         std::exit(0);
     }
     else ConsoleText::printGreen("Buffer memory was allocated!", "Render program");

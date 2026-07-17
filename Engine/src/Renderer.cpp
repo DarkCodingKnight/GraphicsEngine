@@ -64,10 +64,10 @@ void Renderer::recordCommandBuffer(Pipeline* pPipeline,
     vkCmdBindPipeline(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     
     // binding buffers
-    
-    VkBuffer vertexBuffer = pMesh->getBuffer();
     VkDeviceSize offsets[] = { 0 };
-    vkCmdBindVertexBuffers(cBuffer, 0, 1, &vertexBuffer, offsets);
+    
+    vkCmdBindVertexBuffers(cBuffer, 0, 1, pMesh->getVertexBufferPointer(), offsets);
+    vkCmdBindIndexBuffer(cBuffer, *(pMesh->getIndexBufferPointer()), 0, VK_INDEX_TYPE_UINT16);
     
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -85,7 +85,8 @@ void Renderer::recordCommandBuffer(Pipeline* pPipeline,
     
     vkCmdSetScissor(cBuffer, 0, 1, &scissor);
     
-    vkCmdDraw(cBuffer, static_cast<uint32_t>(pMesh->getVerticesSize()), 1, 0, 0); // commandBuffer, vertexCount, instanceCount, firstVertex, firstInstance
+    vkCmdDrawIndexed(cBuffer, static_cast<uint32_t>(pMesh->getIndicesSize()), 1, 0, 0, 0);
+    //vkCmdDraw(cBuffer, static_cast<uint32_t>(pMesh->getVerticesSize()), 1, 0, 0); // commandBuffer, vertexCount, instanceCount, firstVertex, firstInstance
     vkCmdEndRenderPass(cBuffer);
     
     if (vkEndCommandBuffer(cBuffer) != VK_SUCCESS) {
