@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.12)
 set(PROJECT_NAME Engine)
 set(CMAKE_CXX_STANDARD 17)
 
+file(GLOB_RECURSE SOLOUD_AUDIOSOURCES ${SOLOUD_ROOT}/src/audiosource/*.c*)
+file(GLOB_RECURSE SOLOUD_CORE ${SOLOUD_ROOT}/src/core/*.c*)
+file(GLOB_RECURSE SOLOUD_FILTERS ${SOLOUD_ROOT}/src/filter/*.c*)
+
 #--------------PROJECT FILES--------------
 
 set(ENGINE_PRIVATE_INCLUDES
@@ -52,13 +56,19 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ConsoleText)
 add_subdirectory(external/glfw)
 add_subdirectory(external/glm)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC glm 
-					     glfw)
-
-include_directories(${PROJECT_NAME} external/stb_image)
-
-#-------------------Vulkan init--------------
-
 find_package(Vulkan REQUIRED)
-target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::Vulkan)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS} stb_image)
+target_link_libraries(${PROJECT_NAME} PUBLIC glm glfw Vulkan::Vulkan stb_image Qt::Widgets)
+
+set(SOLOUD_SOURCES
+    ${SOLOUD_ROOT}/external/soloud/src/backend/miniaudio/soloud_miniaudio.cpp
+    ${SOLOUD_ROOT}/external/soloud/src/c_api/soloud_c.cpp
+    ${SOLOUD_AUDIOSOURCES}
+    ${SOLOUD_CORE}
+    ${SOLOUD_FILTERS}
+)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${SOLOUD_SOURCES}/includes)
+target_compile_definitions(${PROJECT_NAME} PRIVATE WITH_MINIAUDIO)

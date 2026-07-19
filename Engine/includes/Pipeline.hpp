@@ -16,11 +16,16 @@ namespace Engine {
 class Pipeline {
 public:
     Pipeline() = delete;
-    Pipeline(APImanager* pManager, GLFWwindow* pGLFWwndow, const std::vector<char> vertCode, const std::vector<char> fragCode);
+    Pipeline(APImanager* pManager,
+             GLFWwindow* pGLFWwndow,
+             const std::vector<char> vertCode,
+             const std::vector<char> fragCode,
+             const int _frames_);
     
-    VkShaderModule createShaderModule(const VkDevice& device, const std::vector<char>& shaderCode);
     const VkPipeline& getPipeline() { return graphicsPipeline; };
     SwapChain* getSwapChain() { return pSwapChain; };
+    const VkDescriptorSetLayout& getDescriptorSetLayout() { return descriptorSetLayout; };
+    const VkPipelineLayout& getPipelineLayout() { return pipelineLayout; };
     
     ~Pipeline();
     
@@ -36,10 +41,12 @@ private:
     VkPipelineMultisampleStateCreateInfo createMultisamplingStage();
     VkPipelineColorBlendAttachmentState initColorBlendAttachmentState();
     VkPipelineColorBlendStateCreateInfo createColorBlendState(VkPipelineColorBlendAttachmentState* colorBlendAttachmentState);
-    void createPipelineLayout(const VkDevice& device);
+    void createPipelineLayout();
+    void createDescriptorSetLayout();
     
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
+    VkDescriptorSetLayout descriptorSetLayout;
     
     APImanager* pAPImanager = nullptr;
     SwapChain* pSwapChain = nullptr;

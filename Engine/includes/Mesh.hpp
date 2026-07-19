@@ -1,7 +1,11 @@
 #pragma once
 
-#include <array>
+#define GLM_FORCE_RADIANS
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
+
+#include <chrono>
+#include <array>
 
 #include "Pipeline.hpp"
 #include "VulkanData.hpp"
@@ -37,18 +41,29 @@ struct Vertex {
     }
 };
 
+struct UniformBufferObject {
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 project;
+};
+
 class Mesh {
 public:
     Mesh() = delete;
     Mesh(APImanager* pManager,
          const VkCommandPool& commandPool,
          const std::vector<Vertex>& vert,
-         const std::vector<uint16_t>& ind);
+         const std::vector<uint16_t>& ind,
+         const int _frames_,
+         const VkDescriptorSetLayout& descriptorSetLayout);
     
     size_t getVerticesSize() { return vertices.size(); };
     size_t getIndicesSize() { return indices.size(); };
     VkBuffer* getVertexBufferPointer() { return &vertexBuffer; };
     VkBuffer* getIndexBufferPointer() { return &indexBuffer; };
+    const VkDescriptorSet* getDescriptorSet(int currentFrame) { return &(descriptorSets.at(currentFrame)); };
+    
+    void updateUniformBuffer(uint32_t currentImage, VkExtent2D swapChainExtent);
     
     ~Mesh();
     
@@ -58,21 +73,38 @@ private:
                       const VkDeviceSize bufferSize,
                       const VkCommandPool commandPool,
                       VkBufferUsageFlagBits bufferUsageBit,
-                      VkBuffer& dstBuffer);
+                      VkBuffer& dstBuffer,
+                      VkDeviceMemory& dstMemory);
     
     void copyBuffer(VkBuffer srcBuffer,
                     VkBuffer dstBuffer,
                     VkDeviceSize size,
                     const VkCommandPool& commandPool);
     
+    void createUniformBuffers(int max_frames_in_flight);
+    
+    void createDescriptorPool();
+    void createDescriptorSets(const VkDescriptorSetLayout& descriptorSetLayout);
+    
     APImanager* pAPImanager = nullptr;
     std::vector<Vertex> vertices;
     std::vector<uint16_t> indices;
     
+    // buffers
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
+    
+    std::vector<VkBuffer> uniformBuffers;
+    std::vector<VkDeviceMemory> uniformBuffersMemory;
+    std::vector<void*> uniformBuffersMapped;
+    
+    // descriptors
+    VkDescriptorPool descriptorPool;
+    std::vector<VkDescriptorSet> descriptorSets;
+    
+    int max_frames_in_flight = 0;
 };
 
 }

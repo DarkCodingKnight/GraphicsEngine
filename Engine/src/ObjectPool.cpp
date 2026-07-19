@@ -24,8 +24,7 @@ validationLayers(validLayers), max_frames_in_flight(frames_in_flight)
 
 void ObjectPool::initObjectPool(const char* appName,
                                 const std::string& vertexPath,
-                                const std::string& fragmentPath)
-{
+                                const std::string& fragmentPath) {
     pAPImanager = new APImanager(validationLayers,
                                  pGraphicsApplication->getWindowPtr()->getGLFWwindowPtr(),
                                  max_frames_in_flight);
@@ -42,9 +41,10 @@ void ObjectPool::initObjectPool(const char* appName,
     if (fragEnableCode.has_value()) fragCode = fragEnableCode.value();
     
     pPipeline = new Pipeline(pAPImanager,
-                         pGraphicsApplication->getWindowPtr()->getGLFWwindowPtr(),
-                         vertCode,
-                         fragCode);
+                             pGraphicsApplication->getWindowPtr()->getGLFWwindowPtr(),
+                             vertCode,
+                             fragCode,
+                             max_frames_in_flight);
     
     pRenderer = new Renderer(pAPImanager,
                              max_frames_in_flight,
@@ -54,7 +54,8 @@ void ObjectPool::initObjectPool(const char* appName,
 void ObjectPool::createObject(const std::vector<Vertex>& vertices,
                               const std::vector<uint16_t>& indices)
 {
-    Object* pObject = new Object(pAPImanager, pRenderer, vertices, indices);
+    Object* pObject = new Object(pAPImanager, pRenderer, vertices, indices, max_frames_in_flight, pPipeline->getDescriptorSetLayout());
+    
     
     pObjects.push_back(pObject);
 }

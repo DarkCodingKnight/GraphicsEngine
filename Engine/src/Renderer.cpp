@@ -41,8 +41,6 @@ void Renderer::recordCommandBuffer(Pipeline* pPipeline,
                                    uint32_t imageIndex) {
     VkCommandBufferBeginInfo commandBufferBeginInfo{};
     commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    commandBufferBeginInfo.flags = 0;
-    commandBufferBeginInfo.pInheritanceInfo = nullptr;
     
     if (vkBeginCommandBuffer(cBuffer, &commandBufferBeginInfo) != VK_SUCCESS) {
         ConsoleText::printError("Failed to begin command buffer!", "Renderer");
@@ -61,13 +59,8 @@ void Renderer::recordCommandBuffer(Pipeline* pPipeline,
     renderPassBeginInfo.pClearValues = &clearColor;
     
     vkCmdBeginRenderPass(cBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+    
     vkCmdBindPipeline(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    
-    // binding buffers
-    VkDeviceSize offsets[] = { 0 };
-    
-    vkCmdBindVertexBuffers(cBuffer, 0, 1, pMesh->getVertexBufferPointer(), offsets);
-    vkCmdBindIndexBuffer(cBuffer, *(pMesh->getIndexBufferPointer()), 0, VK_INDEX_TYPE_UINT16);
     
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -84,6 +77,14 @@ void Renderer::recordCommandBuffer(Pipeline* pPipeline,
     scissor.extent = pPipeline->getSwapChain()->getSwapChainExtent();
     
     vkCmdSetScissor(cBuffer, 0, 1, &scissor);
+    
+    // binding buffers
+    VkDeviceSize offsets[] = { 0 };
+    
+    vkCmdBindVertexBuffers(cBuffer, 0, 1, pMesh->getVertexBufferPointer(), offsets);
+    vkCmdBindIndexBuffer(cBuffer, *(pMesh->getIndexBufferPointer()), 0, VK_INDEX_TYPE_UINT16);
+    
+    vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->getPipelineLayout(), 0, 1, pMesh->getDescriptorSet(currentFrame), 0, nullptr);
     
     vkCmdDrawIndexed(cBuffer, static_cast<uint32_t>(pMesh->getIndicesSize()), 1, 0, 0, 0);
     //vkCmdDraw(cBuffer, static_cast<uint32_t>(pMesh->getVerticesSize()), 1, 0, 0); // commandBuffer, vertexCount, instanceCount, firstVertex, firstInstance
@@ -120,6 +121,8 @@ void Renderer::drawFrame(Pipeline* pPipeline, Mesh* pMesh)
         ConsoleText::printError("The result of vkAcquireNextImageKHR() is unsatisfactory!", "Renderer");
         std::exit(0);
     }
+    
+    pMesh->updateUniformBuffer(currentFrame, pPipeline->getSwapChain()->getSwapChainExtent());
     
     vkResetFences(pAPImanager->getVulkanResources()->getLogicalDevice(), 1, &inFlightFences.at(currentFrame));
     
@@ -161,7 +164,6 @@ void Renderer::drawFrame(Pipeline* pPipeline, Mesh* pMesh)
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
     presentInfo.pImageIndices = &imageIndex;
-    presentInfo.pResults = nullptr;
     
     result = vkQueuePresentKHR(pAPImanager->getVulkanResources()->getPresentQueue(), &presentInfo);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {

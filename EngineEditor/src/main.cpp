@@ -1,5 +1,11 @@
 //#define RELEASE
 
+#include <QApplication>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QWidget>
+
 #include <iostream>
 
 #include "ObjectPool.hpp"
@@ -13,6 +19,49 @@ bool enableValidationLayers = true;
 
 namespace EngineEditor {
     
+
+class QT_Appilication {
+public:
+    QT_Appilication() = default;
+    
+    int start(int argc, char* argv[]) {
+        
+        // 1. create application
+        QApplication app(argc, argv);
+        
+        // 2. create main window
+        static QWidget window;
+        window.setWindowTitle("First QT application.");
+        window.resize(400, 300);
+        
+        // 3. create vertical composer
+        QVBoxLayout* layout = new QVBoxLayout(&window);
+        
+        // 4. create text tag
+        QLabel* label = new QLabel("START YOUR ENGINEEE!!!!.", &window);
+        label->setAlignment(Qt::AlignCenter);
+        layout->addWidget(label);
+        
+        // 5. create button
+        QPushButton* button = new QPushButton("Press me to start engine!", &window);
+        button->setGeometry(200, 200, 200, 40);
+        layout->addWidget(button);
+        
+        // 6. attach button signal
+        QObject::connect(button, &QPushButton::clicked, [label]() {
+            window.close();
+        });
+        
+        // 7. show window
+        window.show();
+        
+        // 8. main application loop start
+        return app.exec();
+    }
+    
+    ~QT_Appilication() = default;
+};
+
 class Editor {
 public:
     Editor() {};
@@ -72,10 +121,14 @@ private:
 
 }
 
-int main() {
+int main(int args, char** argv) {
+    EngineEditor::QT_Appilication qt_application = EngineEditor::QT_Appilication();
+    
+    
     EngineEditor::Editor editor = EngineEditor::Editor();
     
     try {
+        qt_application.start(args, argv);
         editor.StartEngine();
     } catch (const std::exception& e) {
         std::string message = "Engine error! " + static_cast<std::string>(e.what());

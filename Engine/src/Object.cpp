@@ -5,10 +5,12 @@ namespace Engine {
 Object::Object(APImanager* pManager,
                Renderer* renderer,
                const std::vector<Vertex>& vertices,
-               const std::vector<uint16_t>& indices) :
+               const std::vector<uint16_t>& indices,
+               const int max_frames_in_flight,
+               const VkDescriptorSetLayout& descriptorLayout) :
 pRenderer(renderer), pAPImanager(pManager)
 {
-    pMesh = new Mesh(pAPImanager, pRenderer->getCommandPool(), vertices, indices);
+    pMesh = new Mesh(pAPImanager, pRenderer->getCommandPool(), vertices, indices, max_frames_in_flight, descriptorLayout);
 }
 
 void Object::draw(Pipeline* pPipeline) {

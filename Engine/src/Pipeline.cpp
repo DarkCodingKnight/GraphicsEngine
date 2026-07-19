@@ -2,7 +2,11 @@
 
 namespace Engine {
 
-Pipeline::Pipeline(APImanager* pManager, GLFWwindow* pGLFWwndow, const std::vector<char> vertCode, const std::vector<char> fragCode) :
+Pipeline::Pipeline(APImanager* pManager,
+                   GLFWwindow* pGLFWwndow,
+                   const std::vector<char> vertCode,
+                   const std::vector<char> fragCode,
+                   const int _frames_) :
 pAPImanager(pManager)
 {
     pSwapChain = new SwapChain(pAPImanager, pGLFWwndow);
@@ -44,7 +48,7 @@ pAPImanager(pManager)
     VkPipelineColorBlendAttachmentState colorBlendAttachmentState = initColorBlendAttachmentState();
     VkPipelineColorBlendStateCreateInfo colorBlendCreateInfo = createColorBlendState(&colorBlendAttachmentState);
     
-    createPipelineLayout(pAPImanager->getVulkanResources()->getLogicalDevice());
+    createPipelineLayout();
     
     VkGraphicsPipelineCreateInfo pipelineCreateInfo{};
     pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -96,8 +100,6 @@ pAPImanager(pManager)
     ConsoleText::printGreen("Shader module was destroyed!", "Pipeline");
     vkDestroyShaderModule(pAPImanager->getVulkanResources()->getLogicalDevice(), fragShaderModule, nullptr);
     ConsoleText::printGreen("Shader module was destroyed!", "Pipeline");
-    
-    
 }
 
 VkShaderModule Pipeline::createShaderModule(const std::vector<char>& shaderCode) {
@@ -196,7 +198,7 @@ VkPipelineRasterizationStateCreateInfo Pipeline::createRasterizationStage() {
     createInfo.polygonMode = VK_POLYGON_MODE_FILL;
     createInfo.lineWidth = 1.0f;
     createInfo.cullMode = VK_CULL_MODE_BACK_BIT;
-    createInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    createInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     createInfo.depthBiasEnable = VK_FALSE;
     createInfo.depthBiasConstantFactor = 0.0f;
     createInfo.depthBiasClamp = 0.0f;
@@ -236,15 +238,17 @@ VkPipelineViewportStateCreateInfo Pipeline::createViewportState(const VkViewport
     return viewportStateCreateInfo;
 }
 
-void Pipeline::createPipelineLayout(const VkDevice& device) {
+void Pipeline::createPipelineLayout() {
+    createDescriptorSetLayout();
+    
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;
-    pipelineLayoutInfo.pSetLayouts = nullptr;
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout; // if matrix
     pipelineLayoutInfo.pushConstantRangeCount = 0;
     pipelineLayoutInfo.pPushConstantRanges = nullptr;
     
-    if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+    if (vkCreatePipelineLayout(pAPImanager->getVulkanResources()->getLogicalDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
         ConsoleText::printError("Failed to create pipeline layout!", "Pipeline");
         std::exit(0);
     }
@@ -253,11 +257,35 @@ void Pipeline::createPipelineLayout(const VkDevice& device) {
     }
 }
 
+void Pipeline::createDescriptorSetLayout() {
+    VkDescriptorSetLayoutBinding uboLayoutBinding{};
+    uboLayoutBinding.binding = 0;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    uboLayoutBinding.pImmutableSamplers = nullptr;
+    
+    VkDescriptorSetLayoutCreateInfo descriptorLayoutInfo{};
+    descriptorLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorLayoutInfo.bindingCount = 1;
+    descriptorLayoutInfo.pBindings = &uboLayoutBinding;
+    
+    if (vkCreateDescriptorSetLayout(pAPImanager->getVulkanResources()->getLogicalDevice(), &descriptorLayoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
+        ConsoleText::printError("Failed to create descriptor set layout!", "Pipeline");
+        std::exit(0);
+    }
+    else ConsoleText::printGreen("Descriptor set layout was created!", "Pipeline");
+}
+
 Pipeline::~Pipeline() {
+    vkDestroyDescriptorSetLayout(pAPImanager->getVulkanResources()->getLogicalDevice(), descriptorSetLayout, nullptr);
+    ConsoleText::printGreen("Descriptor set layout was destroyed!", "Descriptors");
+    
     delete pSwapChain;
     
     vkDestroyPipeline(pAPImanager->getVulkanResources()->getLogicalDevice(), graphicsPipeline, nullptr);
     ConsoleText::printGreen("Pipeline was destroyed!", "Pipeline");
+    
     vkDestroyPipelineLayout(pAPImanager->getVulkanResources()->getLogicalDevice(), pipelineLayout, nullptr);
     ConsoleText::printGreen("Pipeline layout was destroyed!", "Pipeline");
     
