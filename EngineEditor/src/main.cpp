@@ -104,13 +104,21 @@ private:
     const char* TITLE = "GLFW window";
     
     const std::vector<Engine::Vertex> vertices = {
-        {{-0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
-        {{ 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f }},
-        {{ 0.5f,  0.5f }, { 0.0f, 0.0f, 1.0f }},
-        {{-0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f }}
+        {{-0.5f,-0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f }},
+        {{ 0.5f,-0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }},
+        {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f }},
+        {{-0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }},
+        
+        {{-0.5f,-0.5f,-0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f }},
+        {{ 0.5f,-0.5f,-0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }},
+        {{ 0.5f, 0.5f,-0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f }},
+        {{-0.5f, 0.5f,-0.5f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }}
     };
     
-    const std::vector<uint16_t> indices = { 0, 1, 2, 2, 3, 0 };
+    const std::vector<uint16_t> indices = {
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4
+    };
     
     const std::string vertexPath = "/Users/user/Projects/GraphicsEngine/Engine/shaders/vert.spv";
     const std::string fragmentPath = "/Users/user/Projects/GraphicsEngine/Engine/shaders/frag.spv";
@@ -128,7 +136,7 @@ int main(int args, char** argv) {
     EngineEditor::Editor editor = EngineEditor::Editor();
     
     try {
-        qt_application.start(args, argv);
+        //qt_application.start(args, argv);
         editor.StartEngine();
     } catch (const std::exception& e) {
         std::string message = "Engine error! " + static_cast<std::string>(e.what());

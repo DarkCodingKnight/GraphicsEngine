@@ -24,7 +24,7 @@ public:
     const VkRenderPass& getSwapChainRenderPass() { return renderPass; };
     const std::vector<VkFramebuffer>& getSwapChainFramebuffers() { return swapChainFramebuffers; };
     void getSwapChainImages(uint32_t* imageCount);
-
+    
     ~SwapChain();
 
 private:

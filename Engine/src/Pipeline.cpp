@@ -260,15 +260,26 @@ void Pipeline::createPipelineLayout() {
 void Pipeline::createDescriptorSetLayout() {
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
     uboLayoutBinding.binding = 0;
-    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
     uboLayoutBinding.pImmutableSamplers = nullptr;
     
+    // HUITA, NADA PEREPISAC
+    
+    VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+    samplerLayoutBinding.binding = 1;
+    samplerLayoutBinding.descriptorCount = 1;
+    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    samplerLayoutBinding.pImmutableSamplers = nullptr;
+    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    
+    std::vector<VkDescriptorSetLayoutBinding> bindings = { uboLayoutBinding, samplerLayoutBinding };
+    
     VkDescriptorSetLayoutCreateInfo descriptorLayoutInfo{};
     descriptorLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorLayoutInfo.bindingCount = 1;
-    descriptorLayoutInfo.pBindings = &uboLayoutBinding;
+    descriptorLayoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+    descriptorLayoutInfo.pBindings = bindings.data();
     
     if (vkCreateDescriptorSetLayout(pAPImanager->getVulkanResources()->getLogicalDevice(), &descriptorLayoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
         ConsoleText::printError("Failed to create descriptor set layout!", "Pipeline");

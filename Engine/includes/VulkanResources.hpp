@@ -20,12 +20,7 @@ public:
     void createInstance(const char* appName);
     void createSurface(GLFWwindow* pGLFWwindow);
     void createLogicalDevice();
-    
     void pickPhysicalDevice();
-    void checkInstanceExtensionSupport();
-    bool isDeviceSuitable(VkPhysicalDevice device);
-    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-    std::vector<const char*> getGLFWExtensions();
     
     const VkDevice& getLogicalDevice() { return logicalDevice; };
     const VkPhysicalDevice& getPhysicalDevice() { return physicalDevice; };
@@ -36,6 +31,11 @@ public:
     ~VulkanResources();
     
 private:
+    void checkInstanceExtensionSupport();
+    bool isDeviceSuitable(VkPhysicalDevice device);
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+    std::vector<const char*> getGLFWExtensions();
+    
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     VkQueue presentQueue = VK_NULL_HANDLE;
     

@@ -148,7 +148,8 @@ bool VulkanResources::isDeviceSuitable(VkPhysicalDevice device) {
         
         SwapChainSupportDetails swapChainSupport = getSwapChainSupport(device, surface);
         if (!swapChainSupport.formats.empty() &&
-            !swapChainSupport.presentModes.empty()) return true;
+            !swapChainSupport.presentModes.empty() &&
+            deviceFeatures.samplerAnisotropy) return true;
         else return false;
     }
     else return false;

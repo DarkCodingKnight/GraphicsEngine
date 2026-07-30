@@ -23,6 +23,7 @@ set(ENGINE_PRIVATE_INCLUDES
 	includes/Object.hpp
 	includes/ObjectPool.hpp
 	includes/Mesh.hpp
+	includes/Texture.hpp
 )
 
 set(ENGINE_PRIVATE_SOURCES
@@ -38,6 +39,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/Object.cpp
 	src/ObjectPool.cpp
 	src/Mesh.cpp
+	src/Texture.cpp
 )
 
 set(PROJECT_INCLUDES_SOURCES
@@ -51,24 +53,14 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 #--------------LIBRARIES--------------
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ConsoleText)
-
 add_subdirectory(external/glfw)
 add_subdirectory(external/glm)
 
 find_package(Vulkan REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS} stb_image)
-target_link_libraries(${PROJECT_NAME} PUBLIC glm glfw Vulkan::Vulkan stb_image Qt::Widgets)
+target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PUBLIC glm glfw Vulkan::Vulkan Qt::Widgets ConsoleText)
 
-set(SOLOUD_SOURCES
-    ${SOLOUD_ROOT}/external/soloud/src/backend/miniaudio/soloud_miniaudio.cpp
-    ${SOLOUD_ROOT}/external/soloud/src/c_api/soloud_c.cpp
-    ${SOLOUD_AUDIOSOURCES}
-    ${SOLOUD_CORE}
-    ${SOLOUD_FILTERS}
-)
-
-target_include_directories(${PROJECT_NAME} PUBLIC ${SOLOUD_SOURCES}/includes)
-target_compile_definitions(${PROJECT_NAME} PRIVATE WITH_MINIAUDIO)
+target_include_directories(${PROJECT_NAME} PUBLIC external/stb)
+link_directories(${PROJECT_NAME} external/stb)

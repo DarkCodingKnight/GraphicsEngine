@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stb_image.h"
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -10,11 +12,24 @@
 
 namespace Engine {
 
+struct TextureData {
+    stbi_uc* pixelsData;
+    int texWidth;
+    int texHeight;
+    size_t texSize;
+    
+    ~TextureData() {
+        delete pixelsData;
+        pixelsData = nullptr;
+    };
+};
+
 class ResourceManager {
 public:
     ResourceManager() {};
     
-    std::optional<std::vector<char>> readFile(const std::string& filename);
+    static std::optional<std::vector<char>> readFile(const std::string& filename);
+    static TextureData loadTexture(const char* texturePath);
     
     ~ResourceManager() {};
     

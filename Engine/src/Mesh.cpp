@@ -16,6 +16,10 @@ pAPImanager(pManager), vertices(vert), indices(ind)
     }
     else max_frames_in_flight = _frames_;
     
+    
+    pTexture = new Texture(pAPImanager, texturePath, commandPool);
+    
+    
     VkDeviceSize vertexBufferSize = sizeof(vertices.at(0)) * vertices.size();
     createBuffer(vertices.data(), vertexBufferSize, commandPool, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertexBuffer, vertexBufferMemory);
     
@@ -24,8 +28,10 @@ pAPImanager(pManager), vertices(vert), indices(ind)
     
     createUniformBuffers(max_frames_in_flight);
     
+    
+    
     createDescriptorPool();
-    createDescriptorSets(descriptorSetLayout);
+    createDescriptorSets(descriptorSetLayout, pTexture->getImageView(), pTexture->getImageSampler());
 };
 
 template<typename T>
@@ -148,14 +154,20 @@ void Mesh::updateUniformBuffer(uint32_t currentImage, VkExtent2D swapChainExtent
 }
 
 void Mesh::createDescriptorPool() {
-    VkDescriptorPoolSize poolSize{};
-    poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSize.descriptorCount = static_cast<uint32_t>(max_frames_in_flight);
+    VkDescriptorPoolSize uniformBufferDescriptorPoolSize{};
+    uniformBufferDescriptorPoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uniformBufferDescriptorPoolSize.descriptorCount = static_cast<uint32_t>(max_frames_in_flight);
+    
+    VkDescriptorPoolSize imageSamplerDescriptorPoolSize{};
+    imageSamplerDescriptorPoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    imageSamplerDescriptorPoolSize.descriptorCount = static_cast<uint32_t>(max_frames_in_flight);
+    
+    std::vector<VkDescriptorPoolSize> poolSizes = { uniformBufferDescriptorPoolSize, imageSamplerDescriptorPoolSize };
     
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    poolInfo.poolSizeCount = 1;
-    poolInfo.pPoolSizes = &poolSize;
+    poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+    poolInfo.pPoolSizes = poolSizes.data();
     poolInfo.maxSets = static_cast<uint32_t>(max_frames_in_flight);
     
     if (vkCreateDescriptorPool(pAPImanager->getVulkanResources()->getLogicalDevice(),
@@ -168,7 +180,9 @@ void Mesh::createDescriptorPool() {
     else ConsoleText::printGreen("Descriptor pool was created!", "Pipeline");
 }
 
-void Mesh::createDescriptorSets(const VkDescriptorSetLayout& descriptorSetLayout) {
+void Mesh::createDescriptorSets(const VkDescriptorSetLayout& descriptorSetLayout,
+                                VkImageView& textureImageView,
+                                VkSampler& textureImageSampler) {
     std::vector<VkDescriptorSetLayout> layouts(max_frames_in_flight, descriptorSetLayout);
     
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -188,25 +202,46 @@ void Mesh::createDescriptorSets(const VkDescriptorSetLayout& descriptorSetLayout
     else ConsoleText::printGreen("Descriptor sets were allocated!", "Pipeline");
     
     for (size_t i = 0; i < max_frames_in_flight; i++) {
-        VkDescriptorBufferInfo bufferInfo{};
-        bufferInfo.buffer = uniformBuffers.at(i);
-        bufferInfo.offset = 0;
-        bufferInfo.range = sizeof(UniformBufferObject);
+        VkDescriptorBufferInfo uniformBufferInfo{};
+        uniformBufferInfo.buffer = uniformBuffers.at(i);
+        uniformBufferInfo.offset = 0;
+        uniformBufferInfo.range = sizeof(UniformBufferObject);
         
-        VkWriteDescriptorSet descriptorWrite{};
-        descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrite.dstSet = descriptorSets[i];
-        descriptorWrite.dstBinding = 0;
-        descriptorWrite.dstArrayElement = 0;
-        descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        descriptorWrite.descriptorCount = 1;
-        descriptorWrite.pBufferInfo = &bufferInfo;
+        VkWriteDescriptorSet uniformBufferDescriptorWrite{};
+        uniformBufferDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        uniformBufferDescriptorWrite.dstSet = descriptorSets[i];
+        uniformBufferDescriptorWrite.dstBinding = 0;
+        uniformBufferDescriptorWrite.dstArrayElement = 0;
+        uniformBufferDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        uniformBufferDescriptorWrite.descriptorCount = 1;
+        uniformBufferDescriptorWrite.pBufferInfo = &uniformBufferInfo;
         
-        vkUpdateDescriptorSets(pAPImanager->getVulkanResources()->getLogicalDevice(), 1, &descriptorWrite, 0, nullptr);
+        
+        VkDescriptorImageInfo imageInfo{};
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = textureImageView;
+        imageInfo.sampler = textureImageSampler;
+        
+        VkWriteDescriptorSet textureSamplerDescriptorWrite{};
+        textureSamplerDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        textureSamplerDescriptorWrite.dstSet = descriptorSets[i];
+        textureSamplerDescriptorWrite.dstBinding = 1;
+        textureSamplerDescriptorWrite.dstArrayElement = 0;
+        textureSamplerDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        textureSamplerDescriptorWrite.descriptorCount = 1;
+        textureSamplerDescriptorWrite.pImageInfo = &imageInfo;
+        
+        
+        std::vector<VkWriteDescriptorSet> descriptorWrites = { uniformBufferDescriptorWrite, textureSamplerDescriptorWrite };
+        
+        vkUpdateDescriptorSets(pAPImanager->getVulkanResources()->getLogicalDevice(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
     }
 }
 
 Mesh::~Mesh() {
+    delete pTexture;
+    pTexture = nullptr;
+    
     vkDestroyDescriptorPool(pAPImanager->getVulkanResources()->getLogicalDevice(), descriptorPool, nullptr);
     ConsoleText::printGreen("Descriptor pool was destroyed!", "Descriptors");
     

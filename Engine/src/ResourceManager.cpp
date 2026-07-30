@@ -1,5 +1,8 @@
 #include "ResourceManager.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 namespace Engine {
 
 std::optional<std::vector<char>> ResourceManager::readFile(const std::string& filename) {
@@ -24,6 +27,26 @@ std::optional<std::vector<char>> ResourceManager::readFile(const std::string& fi
     file.close();
     
     return buffer;
+}
+
+TextureData ResourceManager::loadTexture(const char* texturePath) {
+    int texWidth;
+    int texHeight;
+    int texChannels;
+    
+    stbi_uc* pixels = stbi_load(texturePath, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    size_t texSize = texWidth * texHeight * 4;
+    
+    TextureData texData = { pixels, texWidth, texHeight, texSize };
+    
+    if (!pixels) {
+        ConsoleText::printError("Failed to load texture!", "Resource manager");
+        std::exit(0);
+    }
+    else {
+        ConsoleText::printGreen("Texture was loaded!", "Resource manager");
+        return texData;
+    }
 }
 
 }

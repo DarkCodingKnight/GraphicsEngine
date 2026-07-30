@@ -35,10 +35,15 @@ Window::Window(int width, int height, const char* title) {
     glfwSetWindowUserPointer(pGLFWWindow, this);
     
     glfwSetFramebufferSizeCallback(pGLFWWindow, framebufferResizeCallback);
+    glfwSetKeyCallback(pGLFWWindow, keyCallback);
 }
 
-void Window::setUpdateObjects(WindowInterface* pUpdateObject) {
-    pUpdateObjects.push_back(pUpdateObject);
+void Window::setFramebufferUpdateSubscribers(WindowInterface* pObject) {
+    pFramebufferUpdateSubscribers.push_back(pObject);
+}
+
+void Window::setKeyCallbackSubscribers(KeyStatusInterface* pObject) {
+    pKeyUpdateSubscribers.push_back(pObject);
 }
 
 int Window::isWindowClose() {

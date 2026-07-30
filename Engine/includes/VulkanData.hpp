@@ -39,7 +39,7 @@ static SwapChainSupportDetails getSwapChainSupport(const VkPhysicalDevice& devic
         swapChainDetails.formats.resize(formatCount);
         vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, (swapChainDetails.formats).data());
     }
-    else ConsoleText::printError("Physical device surface formats count 0", "SwapChain");
+    else ConsoleText::printError("Physical device surface formats count 0!");
     
     //Present modes.
     uint32_t presentModeCount;
@@ -82,6 +82,61 @@ static QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, cons
     return indices;
 }
 
+static void createImageView(const VkDevice& device,
+                            VkImageView* pImageView,
+                            VkImage& image,
+                            VkFormat format)
+{
+    VkImageViewCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    createInfo.image = image;
+    createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    createInfo.format = format;
+    createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    createInfo.subresourceRange.baseMipLevel = 0;
+    createInfo.subresourceRange.levelCount = 1;
+    createInfo.subresourceRange.baseArrayLayer = 0;
+    createInfo.subresourceRange.layerCount = 1;
+    
+    if (vkCreateImageView(device, &createInfo, nullptr, pImageView) != VK_SUCCESS) {
+        ConsoleText::printError("Failed to create texture image view!");
+        std::exit(0);
+    }
+}
+
+static VkFormat findSupportedFormat(const VkPhysicalDevice& physicalDevice,
+                                    const std::vector<VkFormat> candidates,
+                                    VkImageTiling tiling,
+                                    VkFormatFeatureFlags features)
+{
+    for (VkFormat format : candidates) {
+        VkFormatProperties properties;
+        vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &properties);
+        
+        if (tiling == VK_IMAGE_TILING_LINEAR &&
+            (properties.linearTilingFeatures & features) == features) {
+            return format;
+        }
+        else if (tiling == VK_IMAGE_TILING_OPTIMAL &&
+                 (properties.optimalTilingFeatures & features) == features) {
+            return format;
+        }
+        
+        ConsoleText::printError("Failed to find supported format!");
+        std::exit(0);
+    }
+}
+
+static VkFormat findDepthFormat(const VkPhysicalDevice& physicalDevice) {
+    std::vector<VkFormat> candidates = {
+        VK_FORMAT_D32_SFLOAT,
+        VK_FORMAT_D32_SFLOAT_S8_UINT,
+        VK_FORMAT_D24_UNORM_S8_UINT
+    };
+    
+    return findSupportedFormat(physicalDevice, candidates, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+}
+
 static uint32_t findMemoryType(const VkPhysicalDevice& device,
                                uint32_t typeFilter,
                                VkMemoryPropertyFlags properties)
@@ -94,7 +149,7 @@ static uint32_t findMemoryType(const VkPhysicalDevice& device,
             return i;
         }
     }
-    ConsoleText::printError("Failed to find suitable memory type!", "Render program");
+    ConsoleText::printError("Failed to find suitable memory type!");
     std::exit(0);
 }
 
@@ -114,10 +169,10 @@ static void createBufferSource(const VkDevice& logicalDevice,
     
     if (vkCreateBuffer(logicalDevice, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
     {
-        ConsoleText::printError("Failed to create buffer!", "Render program");
+        ConsoleText::printError("Failed to create buffer!");
         std::exit(0);
     }
-    else ConsoleText::printGreen("Buffer was created!", "Render program");
+    else ConsoleText::printGreen("Buffer was created!");
     
     
     VkMemoryRequirements memRequirnaments;
@@ -131,10 +186,10 @@ static void createBufferSource(const VkDevice& logicalDevice,
                                                properties);
     
     if (vkAllocateMemory(logicalDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-        ConsoleText::printError("Failed to allocate buffer memory!", "Render program");
+        ConsoleText::printError("Failed to allocate buffer memory!");
         std::exit(0);
     }
-    else ConsoleText::printGreen("Buffer memory was allocated!", "Render program");
+    else ConsoleText::printGreen("Buffer memory was allocated!");
     
     vkBindBufferMemory(logicalDevice, buffer, bufferMemory, 0);
 }

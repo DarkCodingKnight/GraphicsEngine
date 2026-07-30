@@ -45,7 +45,7 @@ public:
     void drawFrame(Pipeline* pPipeline, Mesh* pMesh);
     void updateWindow() override;
     
-    ~Renderer();
+    ~Renderer() override;
     
 private:
     void createCommandPool();

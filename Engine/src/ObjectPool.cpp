@@ -19,7 +19,7 @@ validationLayers(validLayers), max_frames_in_flight(frames_in_flight)
     }
     
     initObjectPool(applicationName, vertexPath, fragmentPath);
-    pGraphicsApplication->getWindowPtr()->setUpdateObjects(pRenderer);
+    pGraphicsApplication->getWindowPtr()->setFramebufferUpdateSubscribers(pRenderer);
 }
 
 void ObjectPool::initObjectPool(const char* appName,
@@ -56,6 +56,7 @@ void ObjectPool::createObject(const std::vector<Vertex>& vertices,
 {
     Object* pObject = new Object(pAPImanager, pRenderer, vertices, indices, max_frames_in_flight, pPipeline->getDescriptorSetLayout());
     
+    pGraphicsApplication->getWindowPtr()->setKeyCallbackSubscribers(pObject);
     
     pObjects.push_back(pObject);
 }
