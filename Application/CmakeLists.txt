@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.12)
+
+set(PROJECT_NAME Application)
+
+set(EDITOR_INCLUDES
+    includes/Application.hpp
+)
+
+set(EDITOR_SOURCES
+    src/Application.cpp
+)
+
+set(EDITOR_INCLUDES_SOURCES
+    ${EDITOR_INCLUDES}
+    ${EDITOR_SOURCES}
+)
+
+add_library(${PROJECT_NAME} STATIC ${EDITOR_INCLUDES_SOURCES})
+target_include_directories(${PROJECT_NAME} PUBLIC includes)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+
+target_link_libraries(${PROJECT_NAME} GraphicsEngine)

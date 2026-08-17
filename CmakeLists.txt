@@ -6,5 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 project(${PROJECT_NAME})
 
 add_subdirectory(ConsoleText)
-add_subdirectory(Engine)
+add_subdirectory(GraphicsEngine)
+add_subdirectory(Application)
 add_subdirectory(EngineEditor)

@@ -4,9 +4,4 @@ set(PROJECT_NAME EngineEditor)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    BUILD_RPATH "/opt/homebrew/lib;/Users/user/Projects/GraphicsEngine/Engine/external/vulkan/macOS/lib"
-    INSTALL_RPATH "/opt/homebrew/lib;/Users/user/Projects/GraphicsEngine/Engine/external/vulkan/macOS/lib"
-)
-
-target_link_libraries(${PROJECT_NAME} Engine)
+target_link_libraries(${PROJECT_NAME} Application)
