@@ -30,8 +30,10 @@ GraphicsApplication::GraphicsApplication(GraphicsApplicationInfo* pAppInfo)
     pCamera = new Camera(pResourceManager,
                          pSwapChain->getSwapChainExtent().width,
                          pSwapChain->getSwapChainExtent().height,
-                         0.5f, 1000.0f, 45.0f);
+                         0.1f, 1000.0f, 45.0f);
     pCamera->setEnableRenderTime(true);
+    pCamera->setMouseSensitivity(0.5f);
+    pCamera->setCameraSpeed(1.0f);
     
     pRenderer = new Renderer(pVulkanResources,
                              pCamera,

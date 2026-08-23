@@ -7,6 +7,7 @@
 
 #include "SwapChain.hpp"
 #include "DescriptorResources.hpp"
+#include "Camera.hpp"
 
 namespace Engine {
 
@@ -17,7 +18,9 @@ public:
                 DescriptorResources* _pDescriptorResources_,
                 GLFWwindow* _pGLFWwindow_);
     
-    void beginFrame();
+    void beginFrame(Camera* _pCamera_,
+                    float window_width,
+                    float window_height);
     void render(VkCommandBuffer& commandBuffer);
     
     ~IMGUIwindow();

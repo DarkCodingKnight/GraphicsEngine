@@ -34,7 +34,7 @@ public:
     
     std::weak_ptr<GraphicsObjectPool> createGraphicsObjectPool(ObjectPoolInfo* pPoolInfo);
     
-    void setIMGUI();
+    bool getKeyPressed(float keyNumber) { return pResourceManager->getKeyPressed(keyNumber); }
     
     bool updateGraphicsApplication();
     void cleanUpApplication();

@@ -21,6 +21,9 @@ void Application::start() {
     
     
     auto pObject = pObjectPool.lock()->createGraphicsObject(MODEL_PATH, TEXTURE_PATH);
+    
+    //pObject.lock()->rotate(90.0f, false, true, false);
+    
     pObjects.push_back(pObject);
     
     mainLoop();
@@ -30,6 +33,10 @@ void Application::mainLoop() {
     while (pGraphicsApplication->updateGraphicsApplication()) {
         for (auto pObject : pObjects) {
             pObject.lock()->draw();
+            
+            //if (pGraphicsApplication->getKeyPressed()) {
+            //
+            //}
             
             //pObject.lock()->translate(-0.01f, -0.01f, -0.01f);
             //pObject.lock()->rotate(0.005f, 0, 0, 1);

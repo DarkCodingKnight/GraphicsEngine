@@ -63,7 +63,7 @@ VkDescriptorSet* GraphicsObject::getDescriptorSets(glm::mat4 view_matrix,
     ubo.model = getModelMatrix();
     ubo.view = view_matrix;
     ubo.project = proj_matrix;
-    //ubo.project[1][1] *= -1;
+    ubo.project[1][1] *= -1;
     
     memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
     

@@ -149,7 +149,9 @@ void Renderer::drawFrame(std::vector<std::shared_ptr<GraphicsObjectPool>> pGraph
     std::string message = "-------------------- Current frame: " + std::to_string(currentFrame) + " --------------------";
     ConsoleText::printGreen(message, "Renderer");
     
-    if (pIMGUIwindow != nullptr) pIMGUIwindow->beginFrame();
+    if (pIMGUIwindow != nullptr) pIMGUIwindow->beginFrame(pCamera,
+                                                          pSwapChain->getSwapChainExtent().width,
+                                                          pSwapChain->getSwapChainExtent().height);
     
     vkWaitForFences(pVulkanResources->getLogicalDevice(), 1, &inFlightFences.at(currentFrame), VK_TRUE, UINT64_MAX);
     
@@ -210,6 +212,8 @@ void Renderer::drawFrame(std::vector<std::shared_ptr<GraphicsObjectPool>> pGraph
     result = vkQueuePresentKHR(pVulkanResources->getPresentQueue(), &presentInfo);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
         pSwapChain->recreateSwapChain();
+        pCamera->setProjectionMatrix(pSwapChain->getSwapChainExtent().width,
+                                     pSwapChain->getSwapChainExtent().height);
         
         framebufferResized = false;
     }

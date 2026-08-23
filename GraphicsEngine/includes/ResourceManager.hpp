@@ -177,8 +177,16 @@ public:
     
     bool getKeyPressed(int keyNumber) { return key_array[keyNumber]; }
     bool getMouseKeyPressed(int keyNumber) { return mouse_key_array[keyNumber]; }
-    double getCursorOffsetX() { return cursor_offset_x; }
-    double getCursorOffsetY() { return cursor_offset_y; }
+    double getCursorOffsetX() {
+        double offset_x = cursor_offset_x;
+        cursor_offset_x = 0.0f;
+        return offset_x;
+    }
+    double getCursorOffsetY() {
+        double offset_y = cursor_offset_y;
+        cursor_offset_y = 0.0f;
+        return offset_y;
+    }
     double getCursorPositionX() { return cursor_position_x; }
     double getCursorPositionY() { return cursor_position_y; }
     
@@ -196,12 +204,11 @@ public:
         cursor_offset_x = xPos - cursor_position_x;
         cursor_offset_y = yPos - cursor_position_y;
         
-        std::cout << "Mouse X offset: " << cursor_offset_x << ", Mouse Y offset: " << cursor_offset_y << std::endl;
-        
         cursor_position_x = xPos;
         cursor_position_y = yPos;
         
-        std::cout << "Mouse X position: " << xPos << ", Y position: " << yPos << std::endl;
+        std::string message = "Cursor X position: " + std::to_string(xPos) + ", Cursor Y position: " + std::to_string(yPos);
+        ConsoleText::printBlue(message, "Resource manager");
     }
     
     ~ResourceManager() {};
@@ -210,10 +217,10 @@ private:
     bool key_array[348] {};
     bool mouse_key_array[3] {};
     
-    double cursor_offset_x = 0.0;
-    double cursor_offset_y = 0.0;
-    double cursor_position_x = 0.0;
-    double cursor_position_y = 0.0;
+    double cursor_offset_x = 0.0f;
+    double cursor_offset_y = 0.0f;
+    double cursor_position_x = 0.0f;
+    double cursor_position_y = 0.0f;
 };
 
 }
