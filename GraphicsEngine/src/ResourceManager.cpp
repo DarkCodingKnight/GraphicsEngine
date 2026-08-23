@@ -52,8 +52,8 @@ void ResourceManager::loadTexture(const char* texturePath, TextureData* texData)
 }
 
 void ResourceManager::loadModel(const char* modelPath,
-               std::vector<Vertex>* pVertices,
-               std::vector<uint32_t>* indices)
+                                std::vector<Vertex>* pVertices,
+                                std::vector<uint32_t>* indices)
 {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -79,13 +79,13 @@ void ResourceManager::loadModel(const char* modelPath,
                 
                 vertex.texCoord = {
                     attrib.texcoords[2 * index.texcoord_index + 0],
-                    attrib.texcoords[2 * index.texcoord_index + 1]
+                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
                 };
                 
                 vertex.color = { 1.0f, 1.0f, 1.0f };
                 
-                (*pVertices).push_back(vertex);
-                (*indices).push_back(static_cast<uint32_t>((*indices).size()));
+                (*pVertices).emplace_back(vertex);
+                (*indices).emplace_back(static_cast<uint32_t>((*indices).size()));
             }
         }
         ConsoleText::printGreen("Model was loaded!", "Resource manager");

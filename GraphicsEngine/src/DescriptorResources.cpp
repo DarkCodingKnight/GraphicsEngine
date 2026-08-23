@@ -59,17 +59,19 @@ pVulkanResources(_pVulkanResources_)
 }
 
 void EngineDescriptorPool::createDescriptorPool(VulkanResources* _pVulkanResources_,
-                                          uint16_t _max_frames_in_flight_) {
+                                                uint16_t _max_frames_in_flight_) {
+    uint32_t size = 100;
+    
     std::vector<VkDescriptorPoolSize> poolSizes = {
-        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, static_cast<uint32_t>(_max_frames_in_flight_) },
-        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, static_cast<uint32_t>(_max_frames_in_flight_) }
+        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, size },
+        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, size }
     };
     
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
     poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = static_cast<uint32_t>(_max_frames_in_flight_);
+    poolInfo.maxSets = size;
     
     if (vkCreateDescriptorPool(_pVulkanResources_->getLogicalDevice(),
                                &poolInfo,

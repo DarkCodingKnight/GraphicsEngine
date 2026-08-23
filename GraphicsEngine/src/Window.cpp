@@ -57,9 +57,12 @@ bool Window::isWindowClose() {
     return glfwWindowShouldClose(pGLFWWindow);
 }
 
-void Window::destroyWindow() {
-    ConsoleText::printGreen("Window was destroyed!", "Window");
+Window::~Window()
+{
     glfwTerminate();
+    ConsoleText::printGreen("Window was destroyed!", "Window");
+    
+    pGLFWWindow = nullptr;
 }
 
 }

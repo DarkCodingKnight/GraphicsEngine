@@ -5,8 +5,9 @@ namespace Engine {
 IMGUIwindow::IMGUIwindow(VulkanResources* _pVulkanResources_,
                          SwapChain* _pSwapChain_,
                          DescriptorResources* _pDescriptorResources_,
+                         Audio* _pAudio_,
                          GLFWwindow* _pGLFWwindow_) :
-pVulkanResources(_pVulkanResources_), pSwapChain(_pSwapChain_)
+pVulkanResources(_pVulkanResources_), pSwapChain(_pSwapChain_), pAudio(_pAudio_)
 {
     initIMGUIwindow(_pDescriptorResources_, pSwapChain->getSwapChainRenderPass(), _pGLFWwindow_);
 }
@@ -64,29 +65,36 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
                 1000.0f / ImGui::GetIO().Framerate,
                 ImGui::GetIO().Framerate);
     
-    static float camera_speed = 1.0f;
-    static float mouse_sensitivity = 0.5f;
-    static bool frame_time_enable = true;
-    static float z_near = 0.1f;
-    static float z_far = 1000.0f;
-    static float field_of_view = 45.0f;
+    if (_pCamera_ != nullptr) {
+        static float camera_speed = 1.0f;
+        static float mouse_sensitivity = 0.5f;
+        static float z_near = 0.1f;
+        static float z_far = 1000.0f;
+        static float field_of_view = 45.0f;
+        
+        ImGui::Text("Camera info: ");
+        ImGui::SliderFloat("Camera speed", &camera_speed, 0.1f, 1000.0f);
+        ImGui::SliderFloat("Mouse sensitivity", &mouse_sensitivity, 0.1f, 10.0f);
+        ImGui::SliderFloat("Z near", &z_near, 0.1f, 10.0f);
+        ImGui::SliderFloat("Z far", &z_far, 0.1f, 10000.0f);
+        ImGui::SliderFloat("Field of view", &field_of_view, 30.0f, 90.0f);
+        
+        _pCamera_->setCameraSpeed(camera_speed);
+        _pCamera_->setMouseSensitivity(mouse_sensitivity);
+        
+        _pCamera_->setProjectionMatrix(window_width, window_height, z_near, z_far, field_of_view);
+    }
     
-    ImGui::SliderFloat("Camera speed", &camera_speed, 0.1f, 1000.0f);
-    ImGui::SliderFloat("Mouse sensitivity", &mouse_sensitivity, 0.1f, 10.0f);
-    
-    ImGui::Checkbox("Frame time enable", &frame_time_enable);
-    
-    ImGui::SliderFloat("Z near", &z_near, 0.1f, 10.0f);
-    ImGui::SliderFloat("Z far", &z_far, 0.1f, 10000.0f);
-    ImGui::SliderFloat("Field of view", &field_of_view, 30.0f, 90.0f);
+    if (pAudio != nullptr) {
+        static float volume = 0.5f;
+        
+        ImGui::Text("Audio info: ");
+        ImGui::SliderFloat("Audio volume: ", &volume, 0.0f, 1.0f);
+        
+        pAudio->setVolume(volume);
+    }
     
     ImGui::End();
-    
-    _pCamera_->setCameraSpeed(camera_speed);
-    _pCamera_->setMouseSensitivity(mouse_sensitivity);
-    _pCamera_->setEnableRenderTime(frame_time_enable);
-    
-    _pCamera_->setProjectionMatrix(window_width, window_height, z_near, z_far, field_of_view);
 }
 
 void IMGUIwindow::render(VkCommandBuffer& commandBuffer) {
@@ -107,6 +115,7 @@ IMGUIwindow::~IMGUIwindow() {
     
     pVulkanResources = nullptr;
     pSwapChain = nullptr;
+    pAudio = nullptr;
 }
 
 }

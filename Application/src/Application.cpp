@@ -20,28 +20,33 @@ void Application::start() {
     std::weak_ptr<Engine::GraphicsObjectPool> pObjectPool = pGraphicsApplication->createGraphicsObjectPool(&objectPoolInfo);
     
     
-    auto pObject = pObjectPool.lock()->createGraphicsObject(MODEL_PATH, TEXTURE_PATH);
+    pTree = pObjectPool.lock()->createGraphicsObject(TREE_MODEL_PATH, TREE_TEXTURE_PATH);
+    pTree.lock()->scale(-0.9f, -0.9f, -0.9f);
     
-    //pObject.lock()->rotate(90.0f, false, true, false);
+    pDesert = pObjectPool.lock()->createGraphicsObject(DESERT_MODEL_PATH, DESERT_TEXTURE_PATH);
     
-    pObjects.push_back(pObject);
+    pVietnam = pObjectPool.lock()->createGraphicsObject(VIETNAM_MODEL_PATH, VIETNAM_TEXTURE_PATH);
     
     mainLoop();
 }
 
 void Application::mainLoop() {
     while (pGraphicsApplication->updateGraphicsApplication()) {
-        for (auto pObject : pObjects) {
-            pObject.lock()->draw();
-            
-            //if (pGraphicsApplication->getKeyPressed()) {
-            //
-            //}
-            
-            //pObject.lock()->translate(-0.01f, -0.01f, -0.01f);
-            //pObject.lock()->rotate(0.005f, 0, 0, 1);
-            //pObject.lock()->scale(-0.001f, -0.001f, -0.001f);
-        }
+        if (pGraphicsApplication->getKeyPressed(49)) pTree.lock()->scale(-0.00005f, -0.00005f, -0.00005f);
+        if (pGraphicsApplication->getKeyPressed(50)) pTree.lock()->scale(0.00005f, 0.00005f, 0.00005f);
+        
+        if (pGraphicsApplication->getKeyPressed(51)) pTree.lock()->translate(3.0f, 0.0f, 0.0f);
+        if (pGraphicsApplication->getKeyPressed(52)) pTree.lock()->translate(-3.0f, 0.0f, 0.0f);
+        
+        if (pGraphicsApplication->getKeyPressed(53)) pTree.lock()->translate(0.0f, 0.0f, 3.0f);
+        if (pGraphicsApplication->getKeyPressed(54)) pTree.lock()->translate(0.0f, 0.0f, -3.0f);
+        
+        if (pGraphicsApplication->getKeyPressed(55)) pTree.lock()->translate(0.0f, 2.0f, 0.0f);
+        if (pGraphicsApplication->getKeyPressed(56)) pTree.lock()->translate(0.0f, -2.0f, 0.0f);
+        
+        //pTree.lock()->draw();
+        //pDesert.lock()->draw();
+        pVietnam.lock()->draw();
     }
 }
 

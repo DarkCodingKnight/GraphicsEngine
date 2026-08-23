@@ -23,7 +23,10 @@ private:
     
     std::unique_ptr<Engine::GraphicsApplication> pGraphicsApplication;
     std::weak_ptr<Engine::GraphicsObjectPool> pObjectPool;
-    std::vector<std::weak_ptr<Engine::GraphicsObject>> pObjects;
+    
+    std::weak_ptr<Engine::GraphicsObject> pTree;
+    std::weak_ptr<Engine::GraphicsObject> pDesert;
+    std::weak_ptr<Engine::GraphicsObject> pVietnam;
     
     bool enable_validation_layers = false;
     
@@ -35,14 +38,17 @@ private:
     const std::string FRAGMENT_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/shaders/frag.spv";
     
     
-    const char* TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Tree/Textures/TreeTextureBaseColor.png";
-    const char* MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Tree/Model/TreeModel.obj";
+    const char* TREE_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Tree/Textures/TreeTextureBaseColor.png";
+    const char* TREE_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Tree/Model/TreeModel.obj";
+    
+    const char* DESERT_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Desert/DesertTexture.png";
+    const char* DESERT_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Desert/DesertModel.obj";
+    
+    const char* VIETNAM_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Vietnam/VietnamTexture.png";
+    const char* VIETNAM_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Vietnam/VietnamModel.obj";
     
     //const char* TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/VikingRoom/VikingRoomTexture.png";
     //const char* MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/VikingRoom/VikingRoomModel.obj";
-    
-    //const char* TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Desert/DesertTexture.png";
-    //const char* MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Desert/DesertModel.obj";
 };
 
 }

@@ -53,16 +53,16 @@ glm::mat4 Camera::getProjectionMatrix() {
 
 void Camera::updateCamera() {
     if (pResourceManager->getKeyPressed(87)) {
-        cameraPosition_vec += camera_speed * getRenderTime() * cameraDirection_vec;
+        cameraPosition_vec += camera_speed * render_time * cameraDirection_vec;
     }
     if (pResourceManager->getKeyPressed(83)) {
-        cameraPosition_vec -= camera_speed * getRenderTime() * cameraDirection_vec;
+        cameraPosition_vec -= camera_speed * render_time * cameraDirection_vec;
     }
     if (pResourceManager->getKeyPressed(65)) {
-        cameraPosition_vec -= camera_speed * getRenderTime() * (glm::normalize(glm::cross(cameraDirection_vec, cameraUp_vec)));
+        cameraPosition_vec += camera_speed * render_time * cameraRight_vec;
     }
     if (pResourceManager->getKeyPressed(68)) {
-        cameraPosition_vec += camera_speed * getRenderTime() * (glm::normalize(glm::cross(cameraDirection_vec, cameraUp_vec)));
+        cameraPosition_vec -= camera_speed * render_time * cameraRight_vec;
     }
     
     if (pResourceManager->getMouseKeyPressed(0)) updateDirection();

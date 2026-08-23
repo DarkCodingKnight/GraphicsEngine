@@ -31,7 +31,6 @@ GraphicsApplication::GraphicsApplication(GraphicsApplicationInfo* pAppInfo)
                          pSwapChain->getSwapChainExtent().width,
                          pSwapChain->getSwapChainExtent().height,
                          0.1f, 1000.0f, 45.0f);
-    pCamera->setEnableRenderTime(true);
     pCamera->setMouseSensitivity(0.5f);
     pCamera->setCameraSpeed(1.0f);
     
@@ -45,9 +44,15 @@ GraphicsApplication::GraphicsApplication(GraphicsApplicationInfo* pAppInfo)
     
     pDescriptorResources = new DescriptorResources(pVulkanResources, pAppInfo->max_frames_in_flight);
     
+    
+    
+    pAudio = new Audio();
+    //pAudio->playSound("/Users/user/Projects/QT_project/music/Nadezhda_Kadysheva_-_SHiroka_reka_48014119.mp3");
+    
     pIMGUIwindow = new IMGUIwindow(pVulkanResources,
                                    pSwapChain,
                                    pDescriptorResources,
+                                   pAudio,
                                    pWindow->getGLFWwindowPtr());
     
     pRenderer->setIMGUI(pIMGUIwindow);
@@ -94,17 +99,23 @@ void GraphicsApplication::cleanUpApplication() {
 }
 
 GraphicsApplication::~GraphicsApplication() {
+    delete pAudio;
+    delete pIMGUIwindow;
+    
+    delete pCamera;
     delete pSampler;
     delete pDescriptorResources;
     delete pRenderer;
     delete pSwapChain;
     delete pVulkanResources;
-    
-    pWindow->destroyWindow();
-    
     delete pWindow;
     delete pResourceManager;
     
+    pAudio = nullptr;
+    pIMGUIwindow = nullptr;
+    
+    pCamera = nullptr;
+    pSampler = nullptr;
     pDescriptorResources = nullptr;
     pRenderer = nullptr;
     pSwapChain = nullptr;

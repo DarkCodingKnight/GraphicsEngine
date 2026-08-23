@@ -42,8 +42,8 @@ void GraphicsObject::scale(float x_axis, float y_axis, float z_axis)
 
 void GraphicsObject::rotate(float angle, bool x_axis, bool y_axis, bool z_axis)
 {
-    rotation_angles.push_back(angle);
-    rotation_axes.push_back(glm::vec3((float)x_axis, (float)y_axis, (float)z_axis));
+    rotation_angles.emplace_back(angle);
+    rotation_axes.emplace_back(glm::vec3((float)x_axis, (float)y_axis, (float)z_axis));
 }
 
 void GraphicsObject::translate(float x_axis, float y_axis, float z_axis) {
@@ -101,10 +101,10 @@ void GraphicsObject::createDescriptorSets(const VkDescriptorPool& descriptorPool
     if (vkAllocateDescriptorSets(pVulkanResources->getLogicalDevice(),
                                  &allocInfo,
                                  descriptorSets.data()) != VK_SUCCESS) {
-        ConsoleText::printError("Failed to allocate descriptor sets!", "Pipeline");
+        ConsoleText::printError("Failed to allocate descriptor sets!", "GraphicsObject");
         std::exit(0);
     }
-    else ConsoleText::printGreen("Descriptor sets were allocated!", "Pipeline");
+    else ConsoleText::printGreen("Descriptor sets were allocated!", "GraphicsObject");
     
     for (size_t i = 0; i < max_frames_in_flight; i++) {
         VkDescriptorBufferInfo uniformBufferInfo{};

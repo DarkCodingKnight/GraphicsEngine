@@ -8,6 +8,7 @@
 #include "SwapChain.hpp"
 #include "DescriptorResources.hpp"
 #include "Camera.hpp"
+#include "Audio.hpp"
 
 namespace Engine {
 
@@ -16,6 +17,7 @@ public:
     IMGUIwindow(VulkanResources* _pVulkanResources_,
                 SwapChain* _pSwapChain_,
                 DescriptorResources* _pDescriptorResources_,
+                Audio* _pAudio_,
                 GLFWwindow* _pGLFWwindow_);
     
     void beginFrame(Camera* _pCamera_,
@@ -34,6 +36,7 @@ private:
     
     VulkanResources* pVulkanResources = nullptr;
     SwapChain* pSwapChain = nullptr;
+    Audio* pAudio;
 };
 
 }

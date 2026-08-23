@@ -28,6 +28,7 @@ set(ENGINE_PRIVATE_INCLUDES
 	includes/RenderTargetManager.hpp
 	includes/Camera.hpp
 	includes/IMGUIwindow.hpp
+	includes/Audio.hpp
 )
 
 set(ENGINE_PRIVATE_SOURCES
@@ -48,6 +49,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/RenderTargetManager.cpp
 	src/Camera.cpp
 	src/IMGUIwindow.cpp
+	src/Audio.cpp
 )
 
 set(PROJECT_INCLUDES_SOURCES
@@ -63,6 +65,7 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 add_subdirectory(external/glm)
 add_subdirectory(external/imgui)
+add_subdirectory(external/SoLoud)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
@@ -71,6 +74,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	Qt::Widgets 
 	ConsoleText
 	imgui
+	SoLoud
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

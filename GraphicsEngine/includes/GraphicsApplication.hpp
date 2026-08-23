@@ -5,6 +5,7 @@
 #include "Renderer.hpp"
 #include "Camera.hpp"
 #include "DescriptorResources.hpp"
+#include "Audio.hpp"
 
 namespace Engine {
 
@@ -52,6 +53,7 @@ private:
     Camera* pCamera = nullptr;
     
     IMGUIwindow* pIMGUIwindow = nullptr;
+    Audio* pAudio = nullptr;
     
     std::vector<std::shared_ptr<GraphicsObjectPool>> pGraphicsObjectPools = {};
     

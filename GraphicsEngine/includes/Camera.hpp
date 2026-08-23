@@ -28,7 +28,6 @@ public:
     
     void setCameraSpeed(float speed) { camera_speed = speed; }
     void setMouseSensitivity(float sensitivity) { mouse_sensitivity = sensitivity; }
-    void setEnableRenderTime(bool value) { isRenderTimeEnable = value; }
     void setProjectionMatrix(float windowWidth,
                              float windowHeight,
                              float zNear,
@@ -42,10 +41,6 @@ public:
 private:
     void updateCamera();
     void updateDirection();
-    float getRenderTime() {
-        if (isRenderTimeEnable) return render_time;
-        else return 1.0f;
-    }
     
     float window_width = 0.0f;
     float window_height = 0.0f;
@@ -53,7 +48,6 @@ private:
     float z_far = 0.0f;
     float field_of_view = 0.0f;
     
-    bool isRenderTimeEnable = false;
     float last_render_time = 0.0f;
     float render_time = 1.0f;
     float camera_speed = 2.5f;

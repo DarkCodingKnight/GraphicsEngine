@@ -37,7 +37,6 @@ public:
     Window(int width, int height, const char* title);
     
     bool isWindowClose();
-    void destroyWindow();
     
     GLFWwindow* getGLFWwindowPtr() { return pGLFWWindow; };
     
@@ -79,7 +78,7 @@ public:
         }
     }
     
-    ~Window() { pGLFWWindow = nullptr; };
+    ~Window();
     
 private:
     GLFWwindow* pGLFWWindow = nullptr;
