@@ -22,11 +22,13 @@ public:
     void createLogicalDevice();
     void pickPhysicalDevice();
     
+    const VkInstance& getInstance() { return instance; };
     const VkDevice& getLogicalDevice() { return logicalDevice; };
     const VkPhysicalDevice& getPhysicalDevice() { return physicalDevice; };
     const VkSurfaceKHR& getSurface() { return surface; };
     const VkQueue& getGraphicsQueue() { return graphicsQueue; };
     const VkQueue& getPresentQueue() { return presentQueue; };
+    const QueueFamilyIndices& getQueueFamilyIndices() { return indices; }
     
     ~VulkanResources();
     
@@ -45,6 +47,7 @@ private:
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     
     ValidationLayers validationLayers;
+    QueueFamilyIndices indices;
     
     GLFWwindow* pGLFWwindow = nullptr;
     

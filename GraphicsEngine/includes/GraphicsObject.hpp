@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Mesh.hpp"
+#include "DescriptorResources.hpp"
 
 namespace Engine {
 
@@ -44,7 +45,9 @@ public:
     uint32_t getIndexBufferSize() { return pMesh->getIndicesSize(); };
     VkBuffer* getVertexBufferPointer() { return pMesh->getVertexBufferPointer(); };
     VkBuffer& getIndexBuffer() { return pMesh->getIndexBuffer(); };
-    VkDescriptorSet* getDescriptorSets(uint16_t currentFrame);
+    VkDescriptorSet* getDescriptorSets(glm::mat4 view_matrix,
+                                       glm::mat4 proj_matrix,
+                                       uint16_t currentFrame);
     
     ~GraphicsObject();
     

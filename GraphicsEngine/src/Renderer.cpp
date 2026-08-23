@@ -2,20 +2,27 @@
 
 namespace Engine {
 
-Renderer::Renderer(VulkanResources* vulkanResources,
+Renderer::Renderer(VulkanResources* _pVulkanResources_,
+                   Camera* _pCamera_,
                    const int max_frames_in_flight,
                    GLFWwindow* const pWindow) :
-pVulkanResources(vulkanResources)
+pVulkanResources(_pVulkanResources_), pCamera(_pCamera_)
 {
     if (max_frames_in_flight == 0) std::exit(0);
     else this->max_frames_in_flight = max_frames_in_flight;
     
-    createCommandPool();
-    createCommandBuffers();
+    createCommandPool(&commandPool);
+    
+    commandBuffers.resize(max_frames_in_flight);
+    
+    createCommandBuffers(commandPool,
+                         commandBuffers.data(),
+                         static_cast<uint32_t>(commandBuffers.size()));
+    
     createSyncObjects();
 }
 
-void Renderer::createCommandPool() {
+void Renderer::createCommandPool(VkCommandPool* pCommandPool) {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(pVulkanResources->getPhysicalDevice(),
                           pVulkanResources->getSurface());
     
@@ -24,27 +31,28 @@ void Renderer::createCommandPool() {
     commandPoolCreateInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     commandPoolCreateInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
     
-    if (vkCreateCommandPool(pVulkanResources->getLogicalDevice(), &commandPoolCreateInfo, nullptr, &commandPool) != VK_SUCCESS) {
+    if (vkCreateCommandPool(pVulkanResources->getLogicalDevice(), &commandPoolCreateInfo, nullptr, pCommandPool) != VK_SUCCESS) {
         ConsoleText::printError("Failed to create command pool!", "Renderer");
         std::exit(0);
     }
     else ConsoleText::printGreen("Command buffer was created!", "Renderer");
 }
 
-void Renderer::createCommandBuffers() {
-    commandBuffers.resize(max_frames_in_flight);
-    
+void Renderer::createCommandBuffers(VkCommandPool& commandPool,
+                                    VkCommandBuffer* pCommandBuffer,
+                                    uint32_t commandBuffersSize)
+{
     VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
     commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     commandBufferAllocateInfo.commandPool = commandPool;
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    commandBufferAllocateInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+    commandBufferAllocateInfo.commandBufferCount = commandBuffersSize;
     
-    if (vkAllocateCommandBuffers(pVulkanResources->getLogicalDevice(), &commandBufferAllocateInfo, commandBuffers.data()) != VK_SUCCESS) {
-        ConsoleText::printError("Failed to allocate command buffer!", "Renderer");
+    if (vkAllocateCommandBuffers(pVulkanResources->getLogicalDevice(), &commandBufferAllocateInfo, pCommandBuffer) != VK_SUCCESS) {
+        ConsoleText::printError("Failed to allocate command buffers!", "Renderer");
         std::exit(0);
     }
-    else ConsoleText::printGreen("Command buffer was allocated!", "Renderer");
+    else ConsoleText::printGreen("Command buffers were allocated!", "Renderer");
 }
 
 void Renderer::recordCommandBuffer(std::vector<std::shared_ptr<GraphicsObjectPool>> pGraphicsObjectPools,
@@ -59,8 +67,6 @@ void Renderer::recordCommandBuffer(std::vector<std::shared_ptr<GraphicsObjectPoo
         ConsoleText::printError("Failed to begin command buffer!", "Renderer");
         return;
     }
-    else ConsoleText::printGreen("Command buffer was begined!", "Renderer");
-    
     
     VkRenderPassBeginInfo renderPassBeginInfo{};
     renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -114,7 +120,9 @@ void Renderer::recordCommandBuffer(std::vector<std::shared_ptr<GraphicsObjectPoo
                 vkCmdBindDescriptorSets(commandBuffer,
                                         VK_PIPELINE_BIND_POINT_GRAPHICS,
                                         pObjectPool->getPipeline()->getPipelineLayout(),
-                                        0, 1, pObject->getDescriptorSets(currentFrame),
+                                        0, 1, pObject->getDescriptorSets(pCamera->getViewMatrix(),
+                                                                         pCamera->getProjectionMatrix(),
+                                                                         currentFrame),
                                         0, nullptr);
                 
                 //vkCmdDrawIndexed(commandBuffer, pObject->getIndexBufferSize(), 1, 0, 0, 0);
@@ -124,7 +132,7 @@ void Renderer::recordCommandBuffer(std::vector<std::shared_ptr<GraphicsObjectPoo
         }
     }
     
-    
+    if (pIMGUIwindow != nullptr) pIMGUIwindow->render(commandBuffer);
     
     
     vkCmdEndRenderPass(commandBuffer);
@@ -133,7 +141,6 @@ void Renderer::recordCommandBuffer(std::vector<std::shared_ptr<GraphicsObjectPoo
         ConsoleText::printError("Failed to record command buffer!", "Renderer");
         std::exit(0);
     }
-    else ConsoleText::printGreen("Command buffer was recorder!", "Renderer");
 }
 
 void Renderer::drawFrame(std::vector<std::shared_ptr<GraphicsObjectPool>> pGraphicsObjectPools,
@@ -142,6 +149,7 @@ void Renderer::drawFrame(std::vector<std::shared_ptr<GraphicsObjectPool>> pGraph
     std::string message = "-------------------- Current frame: " + std::to_string(currentFrame) + " --------------------";
     ConsoleText::printGreen(message, "Renderer");
     
+    if (pIMGUIwindow != nullptr) pIMGUIwindow->beginFrame();
     
     vkWaitForFences(pVulkanResources->getLogicalDevice(), 1, &inFlightFences.at(currentFrame), VK_TRUE, UINT64_MAX);
     
@@ -188,7 +196,6 @@ void Renderer::drawFrame(std::vector<std::shared_ptr<GraphicsObjectPool>> pGraph
         ConsoleText::printError("Failed to submit draw command buffer!", "Renderer");
         std::exit(0);
     }
-    else ConsoleText::printGreen("Draw command buffer was submited!", "Renderer");
     
     // Presentation
     VkPresentInfoKHR presentInfo{};
@@ -256,6 +263,8 @@ Renderer::~Renderer() {
     ConsoleText::printGreen("Command pool was destroyed!", "Renderer");
     
     pVulkanResources = nullptr;
+    pCamera = nullptr;
+    pIMGUIwindow = nullptr;
 };
 
 }

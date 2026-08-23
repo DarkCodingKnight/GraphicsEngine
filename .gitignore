@@ -1,2 +1,5 @@
+GraphicsEngine/src/RenderTargetManager.cpp
+GraphicsEngine/includes/RenderTargetManager.hpp
+GraphicsEngine/models/Village
 GraphicsEngine/external/
 build/

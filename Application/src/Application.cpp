@@ -31,9 +31,9 @@ void Application::mainLoop() {
         for (auto pObject : pObjects) {
             pObject.lock()->draw();
             
-            //pObject.lock()->translate(0.005f, 0.0f, 0.0f);
-            //pObject.lock()->rotate(0.005f, true, true, true);
-            pObject.lock()->scale(0.01f, 0.01f, 0.01f);
+            //pObject.lock()->translate(-0.01f, -0.01f, -0.01f);
+            //pObject.lock()->rotate(0.005f, 0, 0, 1);
+            //pObject.lock()->scale(-0.001f, -0.001f, -0.001f);
         }
     }
 }

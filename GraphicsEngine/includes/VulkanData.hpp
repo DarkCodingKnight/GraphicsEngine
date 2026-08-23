@@ -223,7 +223,8 @@ static void createImage(const VkDevice& logicalDevice,
                         VkFormat format,
                         VkImageTiling tiling,
                         VkImageUsageFlags usage,
-                        VkMemoryPropertyFlags properties)
+                        VkMemoryPropertyFlags properties,
+                        VkSampleCountFlagBits numSamples)
 {
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -237,7 +238,7 @@ static void createImage(const VkDevice& logicalDevice,
     imageInfo.tiling = tiling;
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     imageInfo.usage = usage;
-    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.samples = numSamples;
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     
     if (vkCreateImage(logicalDevice, &imageInfo, nullptr, &image) != VK_SUCCESS) {

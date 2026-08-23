@@ -3,6 +3,8 @@
 #include <memory>
 
 #include "Renderer.hpp"
+#include "Camera.hpp"
+#include "DescriptorResources.hpp"
 
 namespace Engine {
 
@@ -30,10 +32,9 @@ public:
     
     GraphicsApplication(GraphicsApplicationInfo* pAppInfo);
     
-    Window* getWindowPtr() { return pWindow; };
-    ResourceManager* getResourceManagerPtr() { return pResourceManager; };
-    
     std::weak_ptr<GraphicsObjectPool> createGraphicsObjectPool(ObjectPoolInfo* pPoolInfo);
+    
+    void setIMGUI();
     
     bool updateGraphicsApplication();
     void cleanUpApplication();
@@ -46,6 +47,11 @@ private:
     VulkanResources* pVulkanResources = nullptr;
     SwapChain* pSwapChain = nullptr;
     Renderer* pRenderer = nullptr;
+    DescriptorResources* pDescriptorResources = nullptr;
+    Sampler* pSampler = nullptr;
+    Camera* pCamera = nullptr;
+    
+    IMGUIwindow* pIMGUIwindow = nullptr;
     
     std::vector<std::shared_ptr<GraphicsObjectPool>> pGraphicsObjectPools = {};
     

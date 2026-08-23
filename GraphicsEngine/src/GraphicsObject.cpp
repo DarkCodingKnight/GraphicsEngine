@@ -48,16 +48,11 @@ void GraphicsObject::rotate(float angle, bool x_axis, bool y_axis, bool z_axis)
 
 void GraphicsObject::translate(float x_axis, float y_axis, float z_axis) {
     position_vec += glm::vec3(x_axis, y_axis, z_axis);
-    
-    
-    std::cout << "----------------------- "
-    << " X position: " << position_vec[0]
-    << " Y position: " << position_vec[1]
-    << " Z position: " << position_vec[2]
-    << " -----------------------" << std::endl;
 }
 
-VkDescriptorSet* GraphicsObject::getDescriptorSets(uint16_t currentFrame)
+VkDescriptorSet* GraphicsObject::getDescriptorSets(glm::mat4 view_matrix,
+                                                   glm::mat4 proj_matrix,
+                                                   uint16_t currentFrame)
 {
     static auto startTime = std::chrono::high_resolution_clock::now();
     
@@ -66,9 +61,9 @@ VkDescriptorSet* GraphicsObject::getDescriptorSets(uint16_t currentFrame)
     
     UniformBufferObject ubo{};
     ubo.model = getModelMatrix();
-    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.project = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 10.0f);
-    ubo.project[1][1] *= -1;
+    ubo.view = view_matrix;
+    ubo.project = proj_matrix;
+    //ubo.project[1][1] *= -1;
     
     memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
     
@@ -90,8 +85,8 @@ glm::mat4 GraphicsObject::getModelMatrix() {
 }
 
 void GraphicsObject::createDescriptorSets(const VkDescriptorPool& descriptorPool,
-                                  const VkSampler& textureSampler,
-                                  const VkDescriptorSetLayout& descriptorSetLayout)
+                                          const VkSampler& textureSampler,
+                                          const VkDescriptorSetLayout& descriptorSetLayout)
 {
     std::vector<VkDescriptorSetLayout> layouts(max_frames_in_flight, descriptorSetLayout);
     

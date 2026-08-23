@@ -11,8 +11,6 @@ GraphicsApplication::GraphicsApplication(GraphicsApplicationInfo* pAppInfo)
                          pAppInfo->application_name);
     pResourceManager = new ResourceManager();
     
-    // -APImanager
-    
     pVulkanResources = new VulkanResources();
     pVulkanResources->initVulkan(pAppInfo->application_name,
                                  pWindow->getGLFWwindowPtr(),
@@ -22,19 +20,38 @@ GraphicsApplication::GraphicsApplication(GraphicsApplicationInfo* pAppInfo)
     pVulkanResources->createLogicalDevice();
     
     pSwapChain = new SwapChain(pVulkanResources, pWindow->getGLFWwindowPtr());
-    pSwapChain->createSwapChain();
-    pSwapChain->createImageViews();
-    pSwapChain->createDepthResources();
+    
+    pSampler = new Sampler(pVulkanResources, pSwapChain);
+    
+    pSwapChain->createDepthResources(pSampler->getSampleFlagBits());
     pSwapChain->createRenderPass();
     pSwapChain->createFramebuffers();
     
+    pCamera = new Camera(pResourceManager,
+                         pSwapChain->getSwapChainExtent().width,
+                         pSwapChain->getSwapChainExtent().height,
+                         0.5f, 1000.0f, 45.0f);
+    pCamera->setEnableRenderTime(true);
+    
     pRenderer = new Renderer(pVulkanResources,
+                             pCamera,
                              pAppInfo->max_frames_in_flight,
                              pWindow->getGLFWwindowPtr());
     
     pWindow->setFramebufferUpdateSubscribers(pRenderer);
     pWindow->setKeyCallbackSubscribers(pResourceManager);
+    
+    pDescriptorResources = new DescriptorResources(pVulkanResources, pAppInfo->max_frames_in_flight);
+    
+    pIMGUIwindow = new IMGUIwindow(pVulkanResources,
+                                   pSwapChain,
+                                   pDescriptorResources,
+                                   pWindow->getGLFWwindowPtr());
+    
+    pRenderer->setIMGUI(pIMGUIwindow);
 }
+
+
 
 bool GraphicsApplication::updateGraphicsApplication() {
     if(!pGraphicsObjectPools.empty() && !pWindow->isWindowClose()) {
@@ -45,6 +62,22 @@ bool GraphicsApplication::updateGraphicsApplication() {
         cleanUpApplication();
         return false;
     }
+}
+
+std::weak_ptr<GraphicsObjectPool> GraphicsApplication::createGraphicsObjectPool(ObjectPoolInfo* pPoolInfo)
+{
+    std::shared_ptr<GraphicsObjectPool> pObjectPool(new GraphicsObjectPool(pVulkanResources,
+                                                                           pDescriptorResources,
+                                                                           pSampler,
+                                                                           pSwapChain,
+                                                                           pRenderer->getCommandPool(),
+                                                                           pPoolInfo->vertexPath,
+                                                                           pPoolInfo->fragmentPath,
+                                                                           pWindow->getGLFWwindowPtr(),
+                                                                           pPoolInfo->max_frames_in_flight));
+    
+    pGraphicsObjectPools.push_back(pObjectPool);
+    return pObjectPool;
 }
 
 void GraphicsApplication::cleanUpApplication() {
@@ -58,21 +91,9 @@ void GraphicsApplication::cleanUpApplication() {
     }
 }
 
-std::weak_ptr<GraphicsObjectPool> GraphicsApplication::createGraphicsObjectPool(ObjectPoolInfo* pPoolInfo)
-{
-    std::shared_ptr<GraphicsObjectPool> pObjectPool(new GraphicsObjectPool(pVulkanResources,
-                                                                           pSwapChain,
-                                                                           pRenderer->getCommandPool(),
-                                                                           pPoolInfo->vertexPath,
-                                                                           pPoolInfo->fragmentPath,
-                                                                           pWindow->getGLFWwindowPtr(),
-                                                                           pPoolInfo->max_frames_in_flight));
-    
-    pGraphicsObjectPools.push_back(pObjectPool);
-    return pObjectPool;
-}
-
 GraphicsApplication::~GraphicsApplication() {
+    delete pSampler;
+    delete pDescriptorResources;
     delete pRenderer;
     delete pSwapChain;
     delete pVulkanResources;
@@ -82,6 +103,7 @@ GraphicsApplication::~GraphicsApplication() {
     delete pWindow;
     delete pResourceManager;
     
+    pDescriptorResources = nullptr;
     pRenderer = nullptr;
     pSwapChain = nullptr;
     pVulkanResources = nullptr;

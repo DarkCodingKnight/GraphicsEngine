@@ -32,11 +32,15 @@ Window::Window(int width, int height, const char* title) {
     }
     else ConsoleText::printError("GLFW have not vulkan support!", "Window");
     
+    glfwPollEvents();
+    glfwSetCursorPos(pGLFWWindow, (double)(width) / 2, (double)(height) / 2);
+    
     glfwSetWindowUserPointer(pGLFWWindow, this);
     
     glfwSetFramebufferSizeCallback(pGLFWWindow, framebufferResizeCallback);
     glfwSetKeyCallback(pGLFWWindow, keyCallback);
     glfwSetMouseButtonCallback(pGLFWWindow, mouseCallback);
+    glfwSetCursorPosCallback(pGLFWWindow, cursorPosCallback);
 }
 
 void Window::setFramebufferUpdateSubscribers(WindowInterface* pObject) {

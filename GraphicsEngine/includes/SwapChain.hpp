@@ -10,16 +10,12 @@ class SwapChain {
 public:
     SwapChain() = delete;
     SwapChain(VulkanResources* pResources,
-              GLFWwindow* const pWindow) :
-    pVulkanResources(pResources), pGLFWwindow(pWindow) {};
+              GLFWwindow* const pWindow);
 
-    void createSwapChain();
-    void createSwapChainImages(uint32_t* imageCount);
-    void createImageViews();
     void createRenderPass();
     void createFramebuffers();
     void recreateSwapChain();
-    void createDepthResources();
+    void createDepthResources(VkSampleCountFlagBits sampleFlagBits);
     
     const VkSwapchainKHR& getSwapChain() { return swapChain; };
     const VkExtent2D& getSwapChainExtent() { return swapChainImageExtent; };
@@ -28,10 +24,14 @@ public:
     const VkRenderPass& getSwapChainRenderPass() { return renderPass; };
     const std::vector<VkFramebuffer>& getSwapChainFramebuffers() { return swapChainFramebuffers; };
     
+    void cleanUp();
+    
     ~SwapChain();
 
 private:
-    void cleanUp();
+    void createSwapChain();
+    void createSwapChainImages(uint32_t* imageCount);
+    void createImageViews();
     
     VkSurfaceFormatKHR chooseSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);

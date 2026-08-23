@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "Pipeline.hpp"
+#include "SamplerResources.hpp"
 #include "GraphicsObject.hpp"
 
 namespace Engine {
@@ -16,9 +17,11 @@ public:
     GraphicsObjectPool& operator=(const GraphicsObjectPool& other) = delete;
     GraphicsObjectPool& operator=(GraphicsObjectPool&& other) = delete;
     
-    GraphicsObjectPool(VulkanResources* vulkanResources,
-                       SwapChain* swapChain,
-                       VkCommandPool& comPool,
+    GraphicsObjectPool(VulkanResources* _pVulkanResources_,
+                       DescriptorResources* _pDescriptorResources_,
+                       Sampler* _pSampler_,
+                       SwapChain* _pSwapChain_,
+                       VkCommandPool& _commandPool_,
                        std::string vertexPath,
                        std::string fragmentPath,
                        const GLFWwindow* pGLFWwindow,
@@ -40,18 +43,15 @@ public:
     ~GraphicsObjectPool();
     
 private:
-    void createDescriptorSetLayout();
-    void createDescriptorPool();
-    void createTextureSampler();
-    
     uint16_t max_frames_in_flight = 0;
     
     VulkanResources* pVulkanResources = nullptr;
+    DescriptorResources* pDescriptorResources = nullptr;
+    Sampler* pSampler = nullptr;
     Pipeline* pPipeline = nullptr;
     
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkDescriptorPool descriptorPool;
-    VkSampler textureSampler;
+    std::unique_ptr<DescriptorPool> pDescriptorPool;
+    
     VkCommandPool commandPool;
     
     std::vector<std::shared_ptr<GraphicsObject>> pGraphicsObjects;

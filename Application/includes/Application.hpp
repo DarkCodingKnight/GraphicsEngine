@@ -33,8 +33,16 @@ private:
     const uint16_t WINDOW_HEIGHT = 500;
     const std::string VERTEX_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/shaders/vert.spv";
     const std::string FRAGMENT_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/shaders/frag.spv";
+    
+    
+    //const char* TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Tree/Textures/TreeTextureBaseColor.png";
+    //const char* MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Tree/Model/TreeModel.obj";
+    
     const char* TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/VikingRoom/VikingRoomTexture.png";
     const char* MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/VikingRoom/VikingRoomModel.obj";
+    
+    //const char* TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Desert/DesertTexture.png";
+    //const char* MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Desert/DesertModel.obj";
 };
 
 }

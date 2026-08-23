@@ -2,12 +2,21 @@
 
 namespace Engine {
 
+SwapChain::SwapChain(VulkanResources* pResources,
+          GLFWwindow* const pWindow) :
+pVulkanResources(pResources), pGLFWwindow(pWindow)
+{
+    createSwapChain();
+    createImageViews();
+}
+
 void SwapChain::createSwapChain() {
     SwapChainSupportDetails swapChainSupport = getSwapChainSupport(pVulkanResources->getPhysicalDevice(),
                             pVulkanResources->getSurface());
     
     VkSurfaceFormatKHR surfaceFormat = chooseSurfaceFormat(swapChainSupport.formats);
-    VkPresentModeKHR format = chooseSwapPresentMode(swapChainSupport.presentModes);
+    VkPresentModeKHR format = VK_PRESENT_MODE_IMMEDIATE_KHR;
+    //chooseSwapPresentMode(swapChainSupport.presentModes);
     VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
     
     swapChainImageFormat = surfaceFormat.format;
@@ -214,7 +223,7 @@ void SwapChain::createFramebuffers() {
     }
 }
 
-void SwapChain::createDepthResources()
+void SwapChain::createDepthResources(VkSampleCountFlagBits sampleFlagBits)
 {
     const std::vector<VkFormat> candidates = {
         VK_FORMAT_D32_SFLOAT,
@@ -237,7 +246,8 @@ void SwapChain::createDepthResources()
                 depthFormat,
                 VK_IMAGE_TILING_OPTIMAL,
                 VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                sampleFlagBits);
     
     createImageView(pVulkanResources->getLogicalDevice(),
                     &depthImageView,
@@ -265,7 +275,7 @@ void SwapChain::recreateSwapChain() {
     
     createSwapChain();
     createImageViews();
-    createDepthResources();
+    createDepthResources(VK_SAMPLE_COUNT_1_BIT);
     createRenderPass();
     createFramebuffers();
 }

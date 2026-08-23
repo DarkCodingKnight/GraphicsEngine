@@ -171,7 +171,7 @@ bool VulkanResources::checkDeviceExtensionSupport(VkPhysicalDevice device) {
 }
 
 void VulkanResources::createLogicalDevice() {
-    QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
+    indices = findQueueFamilies(physicalDevice, surface);
     
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<uint32_t> uniqueQueueFamilies = {
