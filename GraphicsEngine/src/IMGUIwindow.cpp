@@ -51,6 +51,10 @@ void IMGUIwindow::initIMGUIwindow(DescriptorResources* _pDescriptorResources_,
     ConsoleText::printGreen("ImGui was initialized!", "ImGui");
 }
 
+void IMGUIwindow::setGraphicsObject(std::shared_ptr<GraphicsObject> pGraphicsObject) {
+    pGraphicsObjects.emplace_back(pGraphicsObject);
+}
+
 void IMGUIwindow::beginFrame(Camera* _pCamera_,
                              float window_width,
                              float window_height)
@@ -65,7 +69,18 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
                 1000.0f / ImGui::GetIO().Framerate,
                 ImGui::GetIO().Framerate);
     
-    if (_pCamera_ != nullptr) {
+    static bool isCameraEnable = false;
+    ImGui::Checkbox("Show Camera parameters", &isCameraEnable);
+    
+    static bool isAudioEnable = false;
+    ImGui::Checkbox("Show Audio parameters", &isAudioEnable);
+    
+    for (auto pGraphicsObject : pGraphicsObjects) {
+        std::string object_name = "Show " + pGraphicsObject->getObjectName() + " parameters";
+        ImGui::Checkbox(object_name.c_str(), pGraphicsObject->setShowWindowParameter());
+    }
+    
+    if (_pCamera_ != nullptr && isCameraEnable) {
         static float camera_speed = 1.0f;
         static float mouse_sensitivity = 0.5f;
         static float z_near = 0.1f;
@@ -85,7 +100,7 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
         _pCamera_->setProjectionMatrix(window_width, window_height, z_near, z_far, field_of_view);
     }
     
-    if (pAudio != nullptr) {
+    if (pAudio != nullptr && isAudioEnable) {
         static float volume = 0.5f;
         
         ImGui::Text("Audio info: ");
@@ -94,10 +109,32 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
         pAudio->setVolume(volume);
     }
     
+    for (auto pGraphicsObject : pGraphicsObjects) {
+        if (*pGraphicsObject->setShowWindowParameter()) {
+            std::string name = pGraphicsObject->getObjectName();
+            const char* objectName = name.c_str();
+            ImGui::Begin(objectName);
+            
+            ImGui::SliderFloat("Position X: ", &pGraphicsObject->getPositionVec()->x, -50.0f, 50.0f);
+            ImGui::SliderFloat("Position Y: ", &pGraphicsObject->getPositionVec()->y, -50.0f, 50.0f);
+            ImGui::SliderFloat("Position Z: ", &pGraphicsObject->getPositionVec()->z, -50.0f, 50.0f);
+            
+            ImGui::End();
+        }
+    }
+    
     ImGui::End();
 }
 
-void IMGUIwindow::render(VkCommandBuffer& commandBuffer) {
+void IMGUIwindow::render(Camera* _pCamera_,
+                         VkCommandBuffer& commandBuffer) {
+    if (_pCamera_ != nullptr) {
+        ImGuiIO& io = ImGui::GetIO();
+        
+        if (io.WantCaptureMouse) _pCamera_->setDirectionUpdate(false);
+        else _pCamera_->setDirectionUpdate(true);
+    }
+    
     ImGui::Render();
     
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);

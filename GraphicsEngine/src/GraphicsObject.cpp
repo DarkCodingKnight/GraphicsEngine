@@ -9,8 +9,9 @@ GraphicsObject::GraphicsObject(VulkanResources* vulkanResources,
                                const VkSampler& textureSampler,
                                const char* texturePath,
                                const char* modelPath,
-                               const uint16_t max_frames) :
-pVulkanResources(vulkanResources), max_frames_in_flight(max_frames)
+                               const uint16_t max_frames,
+                               std::string object_name) :
+pVulkanResources(vulkanResources), max_frames_in_flight(max_frames), objectName(object_name)
 {
     pMesh = new Mesh(pVulkanResources,
                      modelPath,

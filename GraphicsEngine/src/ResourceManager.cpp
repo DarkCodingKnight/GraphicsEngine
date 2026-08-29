@@ -82,7 +82,11 @@ void ResourceManager::loadModel(const char* modelPath,
                     1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
                 };
                 
-                vertex.color = { 1.0f, 1.0f, 1.0f };
+                vertex.color = {
+                    attrib.colors[3 * index.vertex_index + 0],
+                    attrib.colors[3 * index.vertex_index + 1],
+                    attrib.colors[3 * index.vertex_index + 2]
+                };
                 
                 (*pVertices).emplace_back(vertex);
                 (*indices).emplace_back(static_cast<uint32_t>((*indices).size()));

@@ -9,6 +9,7 @@
 #include "DescriptorResources.hpp"
 #include "Camera.hpp"
 #include "Audio.hpp"
+#include "GraphicsObject.hpp"
 
 namespace Engine {
 
@@ -23,7 +24,9 @@ public:
     void beginFrame(Camera* _pCamera_,
                     float window_width,
                     float window_height);
-    void render(VkCommandBuffer& commandBuffer);
+    void render(Camera* _pCamera_,
+                VkCommandBuffer& commandBuffer);
+    void setGraphicsObject(std::shared_ptr<GraphicsObject> pGraphicsObject);
     
     ~IMGUIwindow();
     
@@ -37,6 +40,7 @@ private:
     VulkanResources* pVulkanResources = nullptr;
     SwapChain* pSwapChain = nullptr;
     Audio* pAudio;
+    std::vector<std::shared_ptr<GraphicsObject>> pGraphicsObjects;
 };
 
 }

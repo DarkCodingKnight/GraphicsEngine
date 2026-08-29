@@ -35,10 +35,13 @@ public:
                              float fieldOfView);
     void setProjectionMatrix(float windowWidth,
                              float windowHeight);
+    void setDirectionUpdate(bool value) { isDirectionUpdateEnable = value; };
     
     ~Camera() { pResourceManager = nullptr; };
     
 private:
+    bool isDirectionUpdateEnable = true;
+    
     void updateCamera();
     void updateDirection();
     

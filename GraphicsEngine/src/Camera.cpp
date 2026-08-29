@@ -65,7 +65,7 @@ void Camera::updateCamera() {
         cameraPosition_vec -= camera_speed * render_time * cameraRight_vec;
     }
     
-    if (pResourceManager->getMouseKeyPressed(0)) updateDirection();
+    if (pResourceManager->getMouseKeyPressed(0) && isDirectionUpdateEnable) updateDirection();
 }
 
 void Camera::updateDirection() {

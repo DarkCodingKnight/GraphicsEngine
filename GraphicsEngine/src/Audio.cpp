@@ -19,7 +19,7 @@ void Audio::initAudio() {
     else ConsoleText::printGreen("Sound was initialized!", "Audio");
 }
 
-void Audio::playSound(const char* sound_name) {
+void Audio::playSoundSource(const char* sound_name) {
     int result = wav.load(sound_name);
     
     if (result != 0) {

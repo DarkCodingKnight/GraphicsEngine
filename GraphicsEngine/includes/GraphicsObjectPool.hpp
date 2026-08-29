@@ -5,6 +5,7 @@
 #include "Pipeline.hpp"
 #include "SamplerResources.hpp"
 #include "GraphicsObject.hpp"
+#include "IMGUIwindow.hpp"
 
 namespace Engine {
 
@@ -21,6 +22,7 @@ public:
                        DescriptorResources* _pDescriptorResources_,
                        Sampler* _pSampler_,
                        SwapChain* _pSwapChain_,
+                       IMGUIwindow* _pIMGUIwindow_,
                        VkCommandPool& _commandPool_,
                        std::string vertexPath,
                        std::string fragmentPath,
@@ -28,7 +30,8 @@ public:
                        uint16_t max_frames);
     
     std::weak_ptr<GraphicsObject> createGraphicsObject(const char* modelPath,
-                                                       const char* texturePath);
+                                                       const char* texturePath,
+                                                       std::string object_name);
     
     Pipeline* getPipeline() { return pPipeline; };
     
@@ -49,6 +52,7 @@ private:
     DescriptorResources* pDescriptorResources = nullptr;
     Sampler* pSampler = nullptr;
     Pipeline* pPipeline = nullptr;
+    IMGUIwindow* pIMGUIwindow = nullptr;
     
     std::unique_ptr<DescriptorPool> pDescriptorPool;
     

@@ -20,7 +20,7 @@ public:
     Audio& operator=(Audio&& other) = delete;
     Audio();
     
-    void playSound(const char* sound_name);
+    void playSoundSource(const char* sound_name);
     void setVolume(float volume) { soloud.setGlobalVolume(volume); };
     
     ~Audio();

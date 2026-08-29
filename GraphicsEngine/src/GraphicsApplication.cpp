@@ -47,7 +47,6 @@ GraphicsApplication::GraphicsApplication(GraphicsApplicationInfo* pAppInfo)
     
     
     pAudio = new Audio();
-    //pAudio->playSound("/Users/user/Projects/QT_project/music/Nadezhda_Kadysheva_-_SHiroka_reka_48014119.mp3");
     
     pIMGUIwindow = new IMGUIwindow(pVulkanResources,
                                    pSwapChain,
@@ -77,6 +76,7 @@ std::weak_ptr<GraphicsObjectPool> GraphicsApplication::createGraphicsObjectPool(
                                                                            pDescriptorResources,
                                                                            pSampler,
                                                                            pSwapChain,
+                                                                           pIMGUIwindow,
                                                                            pRenderer->getCommandPool(),
                                                                            pPoolInfo->vertexPath,
                                                                            pPoolInfo->fragmentPath,

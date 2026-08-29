@@ -20,34 +20,35 @@ void Application::start() {
     std::weak_ptr<Engine::GraphicsObjectPool> pObjectPool = pGraphicsApplication->createGraphicsObjectPool(&objectPoolInfo);
     
     
-    pTree = pObjectPool.lock()->createGraphicsObject(TREE_MODEL_PATH, TREE_TEXTURE_PATH);
-    pTree.lock()->scale(-0.9f, -0.9f, -0.9f);
+    //pTree = pObjectPool.lock()->createGraphicsObject(TREE_MODEL_PATH, TREE_TEXTURE_PATH, "Tree");
+    //pTree.lock()->scale(-0.995f, -0.995f, -0.995f);
+    //pDesert = pObjectPool.lock()->createGraphicsObject(DESERT_MODEL_PATH, DESERT_TEXTURE_PATH, "Desert");
+    //pVietnam = pObjectPool.lock()->createGraphicsObject(VIETNAM_MODEL_PATH, VIETNAM_TEXTURE_PATH, "Vietnam");
     
-    pDesert = pObjectPool.lock()->createGraphicsObject(DESERT_MODEL_PATH, DESERT_TEXTURE_PATH);
-    
-    pVietnam = pObjectPool.lock()->createGraphicsObject(VIETNAM_MODEL_PATH, VIETNAM_TEXTURE_PATH);
+    pArrow = pObjectPool.lock()->createGraphicsObject(ARROW_MODEL_PATH, ARROW_TEXTURE_PATH, "Arrow");
+    pLowPoyTree = pObjectPool.lock()->createGraphicsObject(LOWPOLYTREE_MODEL_PATH, LOWPOLYTREE_TEXTURE_PATH, "Tree");
     
     mainLoop();
 }
 
 void Application::mainLoop() {
     while (pGraphicsApplication->updateGraphicsApplication()) {
-        if (pGraphicsApplication->getKeyPressed(49)) pTree.lock()->scale(-0.00005f, -0.00005f, -0.00005f);
-        if (pGraphicsApplication->getKeyPressed(50)) pTree.lock()->scale(0.00005f, 0.00005f, 0.00005f);
-        
-        if (pGraphicsApplication->getKeyPressed(51)) pTree.lock()->translate(3.0f, 0.0f, 0.0f);
-        if (pGraphicsApplication->getKeyPressed(52)) pTree.lock()->translate(-3.0f, 0.0f, 0.0f);
-        
-        if (pGraphicsApplication->getKeyPressed(53)) pTree.lock()->translate(0.0f, 0.0f, 3.0f);
-        if (pGraphicsApplication->getKeyPressed(54)) pTree.lock()->translate(0.0f, 0.0f, -3.0f);
-        
-        if (pGraphicsApplication->getKeyPressed(55)) pTree.lock()->translate(0.0f, 2.0f, 0.0f);
-        if (pGraphicsApplication->getKeyPressed(56)) pTree.lock()->translate(0.0f, -2.0f, 0.0f);
-        
-        //pTree.lock()->draw();
-        //pDesert.lock()->draw();
-        pVietnam.lock()->draw();
+        pArrow.lock()->draw();
+        pLowPoyTree.lock()->draw();
     }
 }
+
+
+//if (pGraphicsApplication->getKeyPressed(49)) pTree.lock()->scale(-0.00005f, -0.00005f, -0.00005f);
+//if (pGraphicsApplication->getKeyPressed(50)) pTree.lock()->scale(0.00005f, 0.00005f, 0.00005f);
+//
+//if (pGraphicsApplication->getKeyPressed(51)) pTree.lock()->translate(3.0f, 0.0f, 0.0f);
+//if (pGraphicsApplication->getKeyPressed(52)) pTree.lock()->translate(-3.0f, 0.0f, 0.0f);
+//
+//if (pGraphicsApplication->getKeyPressed(53)) pTree.lock()->translate(0.0f, 0.0f, 3.0f);
+//if (pGraphicsApplication->getKeyPressed(54)) pTree.lock()->translate(0.0f, 0.0f, -3.0f);
+//
+//if (pGraphicsApplication->getKeyPressed(55)) pTree.lock()->translate(0.0f, 2.0f, 0.0f);
+//if (pGraphicsApplication->getKeyPressed(56)) pTree.lock()->translate(0.0f, -2.0f, 0.0f);
 
 }

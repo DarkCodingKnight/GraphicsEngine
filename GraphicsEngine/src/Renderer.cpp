@@ -132,7 +132,11 @@ void Renderer::recordCommandBuffer(std::vector<std::shared_ptr<GraphicsObjectPoo
         }
     }
     
-    if (pIMGUIwindow != nullptr) pIMGUIwindow->render(commandBuffer);
+    for (auto pGraphicsObjectPool : pGraphicsObjectPools) {
+        
+    }
+    
+    if (pIMGUIwindow != nullptr) pIMGUIwindow->render(pCamera, commandBuffer);
     
     
     vkCmdEndRenderPass(commandBuffer);

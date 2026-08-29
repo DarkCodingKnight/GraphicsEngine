@@ -29,6 +29,7 @@ set(ENGINE_PRIVATE_INCLUDES
 	includes/Camera.hpp
 	includes/IMGUIwindow.hpp
 	includes/Audio.hpp
+	includes/Lighting.hpp
 )
 
 set(ENGINE_PRIVATE_SOURCES
@@ -50,6 +51,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/Camera.cpp
 	src/IMGUIwindow.cpp
 	src/Audio.cpp
+	src/Lighting.cpp
 )
 
 set(PROJECT_INCLUDES_SOURCES

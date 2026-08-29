@@ -33,13 +33,19 @@ public:
                    const VkSampler& textureSampler,
                    const char* texturePath,
                    const char* modelPath,
-                   const uint16_t max_frames);
+                   const uint16_t max_frames,
+                   std::string object_name);
     
     void draw();
     bool isDrawEnable();
     void scale(float x_scale, float y_scale, float z_scale);
     void rotate(float angle, bool x_axis, bool y_axis, bool z_axis);
     void translate(float x_axis, float y_axis, float z_axis);
+    
+    std::string getObjectName() { return objectName; }
+    glm::vec3* getPositionVec() { return &position_vec; };
+    glm::vec3* getScaleVec() { return &scale_vec; };
+    bool* setShowWindowParameter() { return &showParametersWindow; }
     
     uint32_t getVertexBufferSize() { return pMesh->getVerticesSize(); };
     uint32_t getIndexBufferSize() { return pMesh->getIndicesSize(); };
@@ -74,6 +80,9 @@ private:
     glm::vec3 position_vec = glm::vec3(0.0f, 0.0f, 0.0f);
     std::vector<float> rotation_angles;
     std::vector<glm::vec3> rotation_axes;
+    
+    std::string objectName = "";
+    bool showParametersWindow = false;
 };
 
 }
