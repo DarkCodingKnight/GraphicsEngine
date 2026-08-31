@@ -39,6 +39,10 @@ void Texture::createTextureImage(const char* texPath,
                        stagingBuffer,
                        stagingBufferMemory);
     
+    if (textureData.pixelsData == nullptr) std::cout << "sdfsadgfwsdgwegwegsdvgsdhvhjsdhvshvhjsvhjsbdvhjbshjdv" << std::endl;
+    else std::cout << "Everything is OK" << std::endl;
+    std::cout << textureData.texSize << std::endl;
+
     void* data;
     vkMapMemory(pVulkanResources->getLogicalDevice(), stagingBufferMemory, 0, textureData.texSize, 0, &data);
     memcpy(data, textureData.pixelsData, textureData.texSize);

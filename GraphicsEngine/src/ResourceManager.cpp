@@ -8,6 +8,10 @@
 
 namespace Engine {
 
+static void searchPath() {
+    auto path = std::filesystem::current_path();
+}
+
 std::optional<std::vector<char>> ResourceManager::readFile(const std::string& filename) {
     std::ifstream file(filename, std::ios::ate | std::ios::binary);
     
@@ -42,7 +46,11 @@ void ResourceManager::loadTexture(const char* texturePath, TextureData* texData)
     size_t texSize = texWidth * texHeight * 4;
     uint32_t mipLevels = std::floor(std::log2(std::max(texWidth, texHeight)));
     
-    *texData = { pixels, texWidth, texHeight, texSize, mipLevels };
+    texData->pixelsData = pixels;
+    texData->texWidth = texWidth;
+    texData->texHeight = texHeight;
+    texData->texSize = texSize;
+    texData->mipLevels = mipLevels;
     
     if (!pixels) {
         ConsoleText::printError("Failed to load texture!", "Resource manager");

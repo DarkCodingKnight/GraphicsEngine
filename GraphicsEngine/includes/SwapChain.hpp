@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "VulkanData.hpp"
 #include "ConsoleText.hpp"
 #include "VulkanResources.hpp"

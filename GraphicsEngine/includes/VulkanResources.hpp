@@ -1,19 +1,25 @@
 #pragma once
 
+#include <algorithm>
+
+#include "Window.hpp"
 #include "VulkanData.hpp"
 #include "ValidationLayers.hpp"
 #include "ConsoleText.hpp"
 
-namespace Engine {
-
 const std::vector<const char*> deviceExtensions = {
-    "VK_KHR_portability_subset",
     "VK_KHR_swapchain"
 };
 
+#ifdef __APPLE__
+deviceExtensions.emplace_back("VK_KHR_portability_subset");
+#endif
+
+namespace Engine {
+
 class VulkanResources {
 public:
-    VulkanResources() {};
+    VulkanResources() = default;
     
     void initVulkan(const char* appName, GLFWwindow* pGLFWwindow, bool enableValidationLayers);
     

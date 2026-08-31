@@ -46,18 +46,19 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
         default:
             ConsoleText::print((std::string)(pCallbackData->pMessage), "Debug messenger");;
     }
+    return VK_FALSE;
 }
 
 class ValidationLayers {
 public:
-    ValidationLayers() {};
+    ValidationLayers() = default;
     
     bool checkValidationLayerSupport();
     void setupDebugMessenger();
     void createDebugUtilsMessenger(VkInstance instance, const VkAllocationCallbacks* pAllocator);
     void destroyDebuUtilsMessenger(VkInstance instance, const VkAllocationCallbacks* pAllocator);
-    
-    ~ValidationLayers() {};
+
+    ~ValidationLayers() = default;
     
     VkDebugUtilsMessengerEXT debugMessenger;
     VkDebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo;

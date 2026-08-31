@@ -37,8 +37,8 @@ private:
     const uint16_t MAX_FRAMES_IN_FLIGHT = 2;
     const uint16_t WINDOW_WIDTH = 500;
     const uint16_t WINDOW_HEIGHT = 500;
-    const std::string VERTEX_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/shaders/vert.spv";
-    const std::string FRAGMENT_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/shaders/frag.spv";
+    const std::string VERTEX_PATH = "D:/Projects/GraphicsEngine/GraphicsEngine/shaders/vert.spv";
+    const std::string FRAGMENT_PATH = "D:/Projects/GraphicsEngine/GraphicsEngine/shaders/frag.spv";
     
     
     const char* TREE_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Tree/Textures/TreeTextureBaseColor.png";
@@ -50,11 +50,11 @@ private:
     const char* VIETNAM_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Vietnam/VietnamTexture.png";
     const char* VIETNAM_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Vietnam/VietnamModel.obj";
     
-    const char* ARROW_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Platforms/Models/Textures/colormap.png";
-    const char* ARROW_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Platforms/Models/arrow.obj";
+    const char* ARROW_TEXTURE_PATH = "D:/Projects/GraphicsEngine/GraphicsEngine/models/Platforms/Models/Textures/colormap.png";
+    const char* ARROW_MODEL_PATH = "D:/Projects/GraphicsEngine/GraphicsEngine/models/Platforms/Models/arrow.obj";
     
-    const char* LOWPOLYTREE_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Platforms/Models/Textures/colormap.png";
-    const char* LOWPOLYTREE_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Platforms/Models/tree.obj";
+    const char* LOWPOLYTREE_TEXTURE_PATH = "D:/Projects/GraphicsEngine/GraphicsEngine/models/Platforms/Models/Textures/colormap.png";
+    const char* LOWPOLYTREE_MODEL_PATH = "D:/Projects/GraphicsEngine/GraphicsEngine/models/Platforms/Models/tree.obj";
     
     //const char* TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/VikingRoom/VikingRoomTexture.png";
     //const char* MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/VikingRoom/VikingRoomModel.obj";

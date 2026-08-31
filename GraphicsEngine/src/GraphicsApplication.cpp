@@ -46,7 +46,7 @@ GraphicsApplication::GraphicsApplication(GraphicsApplicationInfo* pAppInfo)
     
     
     
-    pAudio = new Audio();
+    //pAudio = new Audio();
     
     pIMGUIwindow = new IMGUIwindow(pVulkanResources,
                                    pSwapChain,

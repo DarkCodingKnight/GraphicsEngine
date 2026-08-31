@@ -130,7 +130,7 @@ void VulkanResources::pickPhysicalDevice() {
 
 bool VulkanResources::isDeviceSuitable(VkPhysicalDevice device) {
     QueueFamilyIndices indices = findQueueFamilies(device, surface);
-    
+
     if (indices.isComplete() && checkDeviceExtensionSupport(device)) {
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
@@ -161,13 +161,17 @@ bool VulkanResources::checkDeviceExtensionSupport(VkPhysicalDevice device) {
     std::vector<VkExtensionProperties> availableExtensions(extensionCount);
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
     
-    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
-    
-    for (const auto& extension : availableExtensions) {
-        requiredExtensions.erase(extension.extensionName);
+    for (auto deviceExtension : deviceExtensions) {
+        bool isExtensionExist = false;
+        for (auto availableExtension : availableExtensions) {
+            std::cout << availableExtension.extensionName << " " << deviceExtension << std::endl;
+            if (strcmp(availableExtension.extensionName, deviceExtension) == 0) {
+                isExtensionExist = true;
+            }
+        }
+        if (!isExtensionExist) return false;
     }
-    
-    return requiredExtensions.empty();
+    return true;
 }
 
 void VulkanResources::createLogicalDevice() {

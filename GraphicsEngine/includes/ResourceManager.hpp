@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <filesystem>
 #include <optional>
 #include <glm/glm.hpp>
 
@@ -168,6 +169,7 @@ class ResourceManager : public KeyStatusInterface {
 public:
     ResourceManager() {};
     
+    static void searchPath();
     static std::optional<std::vector<char>> readFile(const std::string& filename);
     static void loadTexture(const char* texturePath,
                                    TextureData* texData);
