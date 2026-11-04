@@ -70,17 +70,29 @@ add_subdirectory(external/glm)
 add_subdirectory(external/imgui)
 add_subdirectory(external/SoLoud)
 
+# Безопасный find_package: MoltenVK — опционально
+find_package(Vulkan REQUIRED)
+
 target_link_libraries(${PROJECT_NAME} PUBLIC
-	glfw
-	glm
-	ConsoleText
-	imgui
-	SoLoud
+    Vulkan::Vulkan
+    glfw
+    glm
+    ConsoleText
+    imgui
+    SoLoud
 )
 
+# Линкуем MoltenVK только если CMake его реально нашёл
+if(TARGET Vulkan::MoltenVK)
+    target_link_libraries(${PROJECT_NAME} PUBLIC Vulkan::MoltenVK)
+    message(STATUS "Linking against Vulkan::MoltenVK")
+else()
+    message(STATUS "Vulkan::MoltenVK not found — relying on loader ICD")
+endif()
+
 target_include_directories(${PROJECT_NAME} PUBLIC
-	${Vulkan_INCLUDE_DIRS}
-	external/stb
-	external/tiny_obj_loader
-	external/imgui
+    ${Vulkan_INCLUDE_DIRS}
+    external/stb
+    external/tiny_obj_loader
+    external/imgui
 )

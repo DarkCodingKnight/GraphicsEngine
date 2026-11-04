@@ -7,12 +7,10 @@
 #include "ValidationLayers.hpp"
 #include "ConsoleText.hpp"
 
-const std::vector<const char*> deviceExtensions = {
-    "VK_KHR_swapchain"
-};
+
 
 #ifdef __APPLE__
-deviceExtensions.emplace_back("VK_KHR_portability_subset");
+//deviceExtensions.emplace_back("VK_KHR_portability_subset");
 #endif
 
 namespace Engine {
@@ -51,6 +49,10 @@ private:
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice logicalDevice = VK_NULL_HANDLE;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
+    
+    std::vector<const char*> deviceExtensions = {
+        "VK_KHR_swapchain"
+    };
     
     ValidationLayers validationLayers;
     QueueFamilyIndices indices;

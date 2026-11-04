@@ -20,21 +20,23 @@ void Application::start() {
     std::weak_ptr<Engine::GraphicsObjectPool> pObjectPool = pGraphicsApplication->createGraphicsObjectPool(&objectPoolInfo);
     
     
-    //pTree = pObjectPool.lock()->createGraphicsObject(TREE_MODEL_PATH, TREE_TEXTURE_PATH, "Tree");
-    //pTree.lock()->scale(-0.995f, -0.995f, -0.995f);
-    //pDesert = pObjectPool.lock()->createGraphicsObject(DESERT_MODEL_PATH, DESERT_TEXTURE_PATH, "Desert");
+    pTree = pObjectPool.lock()->createGraphicsObject(TREE_MODEL_PATH, TREE_TEXTURE_PATH, "Tree");
+    pTree.lock()->scale(-0.995f, -0.995f, -0.995f);
+    pDesert = pObjectPool.lock()->createGraphicsObject(DESERT_MODEL_PATH, DESERT_TEXTURE_PATH, "Desert");
     //pVietnam = pObjectPool.lock()->createGraphicsObject(VIETNAM_MODEL_PATH, VIETNAM_TEXTURE_PATH, "Vietnam");
     
-    pArrow = pObjectPool.lock()->createGraphicsObject(ARROW_MODEL_PATH, ARROW_TEXTURE_PATH, "Arrow");
-    pLowPoyTree = pObjectPool.lock()->createGraphicsObject(LOWPOLYTREE_MODEL_PATH, LOWPOLYTREE_TEXTURE_PATH, "Tree");
+    //pArrow = pObjectPool.lock()->createGraphicsObject(ARROW_MODEL_PATH, ARROW_TEXTURE_PATH, "Arrow");
+    //pLowPoyTree = pObjectPool.lock()->createGraphicsObject(LOWPOLYTREE_MODEL_PATH, LOWPOLYTREE_TEXTURE_PATH, "Tree");
     
     mainLoop();
 }
 
 void Application::mainLoop() {
     while (pGraphicsApplication->updateGraphicsApplication()) {
-        pArrow.lock()->draw();
-        pLowPoyTree.lock()->draw();
+        //pArrow.lock()->draw();
+        //pLowPoyTree.lock()->draw();
+        pDesert.lock()->draw();
+        pTree.lock()->draw();
     }
 }
 

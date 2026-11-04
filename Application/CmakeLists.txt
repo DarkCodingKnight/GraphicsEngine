@@ -4,10 +4,12 @@ set(PROJECT_NAME Application)
 
 set(EDITOR_INCLUDES
     includes/Application.hpp
+    includes/Kalman.hpp
 )
 
 set(EDITOR_SOURCES
     src/Application.cpp
+    src/Kalman.cpp
 )
 
 set(EDITOR_INCLUDES_SOURCES

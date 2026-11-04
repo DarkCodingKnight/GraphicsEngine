@@ -101,8 +101,10 @@ void VulkanResources::checkInstanceExtensionSupport() {
 }
 
 void VulkanResources::createSurface(GLFWwindow* pGLFWwindow) {
-    if (glfwCreateWindowSurface(instance, pGLFWwindow, nullptr, &surface) != VK_SUCCESS) {
+    VkResult result = glfwCreateWindowSurface(instance, pGLFWwindow, nullptr, &surface);
+    if (result != VK_SUCCESS) {
         ConsoleText::print("Failed to create surface!", "Vulkan");
+        ConsoleText::print(std::to_string(result));
         std::exit(0);
     }
     else ConsoleText::printGreen("Surface was created!", "Vulkan");

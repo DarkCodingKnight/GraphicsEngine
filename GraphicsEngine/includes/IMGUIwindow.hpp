@@ -41,6 +41,8 @@ private:
     SwapChain* pSwapChain = nullptr;
     Audio* pAudio;
     std::vector<std::shared_ptr<GraphicsObject>> pGraphicsObjects;
+    
+    float sinus = 1;
 };
 
 }
