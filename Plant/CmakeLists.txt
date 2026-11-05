@@ -1,0 +1,30 @@
+set(PROJECT_NAME Plant)
+
+set(EDITOR_INCLUDES
+    includes/Motor.hpp
+    includes/Kalman.hpp
+    includes/PWM.hpp
+    includes/ADC.hpp
+    includes/PI.hpp
+    includes/DRV8301.hpp
+)
+
+set(EDITOR_SOURCES
+    src/Motor.cpp
+    src/Kalman.cpp
+    src/PWM.cpp
+    src/ADC.cpp
+    src/PI.cpp
+    src/DRV8301.cpp
+)
+
+set(EDITOR_INCLUDES_SOURCES
+    ${EDITOR_INCLUDES}
+    ${EDITOR_SOURCES}
+)
+
+add_library(${PROJECT_NAME} STATIC ${EDITOR_INCLUDES_SOURCES})
+target_include_directories(${PROJECT_NAME} PUBLIC includes)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+
+target_link_libraries(${PROJECT_NAME} GraphicsEngine)

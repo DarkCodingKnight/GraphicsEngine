@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicsApplication.hpp"
+#include "Motor.hpp"
 
 namespace EngineEditor {
 
