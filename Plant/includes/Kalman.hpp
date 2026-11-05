@@ -20,9 +20,8 @@ public:
     Kalman& operator=(const Kalman& other) = delete;
     Kalman& operator=(Kalman&& other) = delete;
     
-    Kalman() = default;
-    
-    void set_KalmanValues(KalmanValues* const _pKalmanValues_) { pKalmanValues = _pKalmanValues_; }
+    Kalman(KalmanValues* const _pKalmanValues_)
+    : pKalmanValues(_pKalmanValues_) { init(); }
     
     void init();
     void update(float v_alpha,

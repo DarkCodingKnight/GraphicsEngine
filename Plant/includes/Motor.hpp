@@ -1,8 +1,8 @@
 #pragma once
 
 #include "DRV8301.hpp"
-#include "ADC.hpp"
-
+#include "PI.hpp"
+#include "PWM.hpp"
 #include "Kalman.hpp"
 
 #include "IMGUIwindow.hpp"
@@ -31,12 +31,33 @@ private:
     
     float ia = 0.0f;
     float ib = 0.0f;
+    float id = 0.0f;
+    float iq = 0.0f;
+    float id_ref = 0.0f;
+    float iq_ref = 0.0f;
+    float i_alpha = 0.0f;
+    float i_beta = 0.0f;
+    
+    float vd = 0.0f;
+    float vq = 0.0f;
+    float v_alpha = 0.0f;
+    float v_beta = 0.0f;
+    
+    float speed = 0.0f;
+    float angle = 0.0f;
     
     Engine::IMGUIwindow* pIMGUIwindow = nullptr;
     std::weak_ptr<Engine::IMPLOTwindow> pIMPLOTwindow;
     
     DRV8301* pDRV8301 = nullptr;
     ADC* pADC = nullptr;
+    PWM* pPWM = nullptr;
+    
+    PI_Current_Values PI_values;
+    PI_controller* pPI = nullptr;
+    
+    KalmanValues Kalman_values;
+    Kalman* pKalman = nullptr;
 };
 
 }

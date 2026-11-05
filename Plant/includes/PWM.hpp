@@ -19,6 +19,7 @@ public:
     
     PWM(ENGINE_FREQUENCY _frequency_selector_) { set_frequency(_frequency_selector_); }
     
+    float get_TS() { return Ts; }
     void set_frequency(ENGINE_FREQUENCY _frequency_selector_);
     
     ~PWM() = default;

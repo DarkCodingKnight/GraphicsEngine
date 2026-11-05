@@ -21,6 +21,7 @@ public:
     ADC(float _gain_) { gain = _gain_; }
     
     void get_values(float& ia, float& ib);
+    float get_battery_voltage() { return battery_voltage; }
     uint32_t get_adc_value(ADC_RANKS rank);
     
     ~ADC() = default;
