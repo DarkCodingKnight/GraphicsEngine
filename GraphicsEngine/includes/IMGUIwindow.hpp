@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
+#include "implot.h"
 
 #include "SwapChain.hpp"
 #include "DescriptorResources.hpp"
@@ -34,6 +35,7 @@ private:
     void initIMGUIwindow(DescriptorResources* _pDescriptorResources_,
                          const VkRenderPass& renderPass,
                          GLFWwindow* _pGLFWwindow_);
+    void drawSignalWindow();
     
     std::unique_ptr<DescriptorPool> pIMGUIDescriptorPool;
     
@@ -43,6 +45,14 @@ private:
     std::vector<std::shared_ptr<GraphicsObject>> pGraphicsObjects;
     
     float sinus = 1;
+    
+    std::vector<float> t;
+    std::vector<float> omega_true;
+    std::vector<float> omega_est;
+    std::vector<float> theta_true;
+    std::vector<float> theta_est;
+    
+    int N = 0;
 };
 
 }

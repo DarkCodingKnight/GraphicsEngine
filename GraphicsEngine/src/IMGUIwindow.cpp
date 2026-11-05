@@ -16,6 +16,7 @@ void IMGUIwindow::initIMGUIwindow(DescriptorResources* _pDescriptorResources_,
                                   const VkRenderPass& renderPass,
                                   GLFWwindow* _pGLFWwindow_)
 {
+    // ImGui initializing
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     
@@ -48,6 +49,10 @@ void IMGUIwindow::initIMGUIwindow(DescriptorResources* _pDescriptorResources_,
     
     ImGui_ImplVulkan_Init(&init_info);
     
+    // ImPlot initializing
+    ImGui::CreateContext();
+    ImPlot::CreateContext();
+    
     ConsoleText::printGreen("ImGui was initialized!", "ImGui");
 }
 
@@ -69,30 +74,24 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
                 1000.0f / ImGui::GetIO().Framerate,
                 ImGui::GetIO().Framerate);
     
-    static float history[256] = {};
-    static int head = 0;
+    drawSignalWindow();
     
-    history[head] = sinus;
-    head = (head + 1) % 256;
+    t.emplace_back(sinus);
+    omega_true.emplace_back(sinus);
     
-    sinus = sin(sinus);
-    if (sinus <= 0.1f) sinus = 1.0f;
-    
-    ImGui::Begin("Signal");
-    ImVec2 p = ImGui::GetCursorScreenPos();
-    ImVec2 size(300, 100);
-    ImDrawList* dl = ImGui::GetWindowDrawList();
-    
-    dl->AddRectFilled(p, ImVec2(p.x + size.x, p.y + size.y), IM_COL32(30, 30, 30, 25));
-    
-    for (int i = 0; i < 255; ++i) {
-        float y0 = p.y + size.y * (1.0f - history[(head + i) % 256]);
-        float y1 = p.y + size.y * (1.0f - history[(head + i + 1) % 256]);
-        
-        dl->AddLine(ImVec2(p.x + i, y0), ImVec2(p.x + i + 1, y1), IM_COL32(0, 255, 0, 255));
+    ImGui::Begin("EKF Results");
+    if (ImPlot::BeginPlot("Motor Speed", ImVec2(-1, 300))) {
+        ImPlot::SetupAxes("time (s)", "omega (rad/s)");
+        ImPlot::PlotLine("True", t.data(), omega_true.data(), N);
+        ImPlot::PlotLine("EKF", t.data(), omega_est.data(), N);
+        ImPlot::EndPlot();
     }
-    
-    //ImGui::Dummy(size);
+    if (ImPlot::BeginPlot("Rotor Angle", ImVec2(-1, 300))) {
+        ImPlot::SetupAxes("time (s)", "theta (rad)");
+        ImPlot::PlotLine("True", t.data(), theta_true.data(), N);
+        ImPlot::PlotLine("EKF",  t.data(), theta_est.data(),  N);
+        ImPlot::EndPlot();
+    }
     ImGui::End();
     
     static bool isCameraEnable = false;
@@ -166,12 +165,41 @@ void IMGUIwindow::render(Camera* _pCamera_,
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 }
 
+void IMGUIwindow::drawSignalWindow() {
+    static float history[256] = {};
+    static int head = 0;
+    
+    history[head] = sinus;
+    head = (head + 1) % 256;
+    
+    sinus = sin(sinus);
+    if (sinus <= 0.1f) sinus = 1.0f;
+    
+    ImGui::Begin("Signal");
+    ImVec2 p = ImGui::GetCursorScreenPos();
+    ImVec2 size(300, 100);
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    
+    dl->AddRectFilled(p, ImVec2(p.x + size.x, p.y + size.y), IM_COL32(30, 30, 30, 25));
+    
+    for (int i = 0; i < 255; ++i) {
+        float y0 = p.y + size.y * (1.0f - history[(head + i) % 256]);
+        float y1 = p.y + size.y * (1.0f - history[(head + i + 1) % 256]);
+        
+        dl->AddLine(ImVec2(p.x + i, y0), ImVec2(p.x + i + 1, y1), IM_COL32(0, 255, 0, 255));
+    }
+    
+    //ImGui::Dummy(size);
+    ImGui::End();
+}
+
 IMGUIwindow::~IMGUIwindow() {
     vkDeviceWaitIdle(pVulkanResources->getLogicalDevice());
     
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
     
     ConsoleText::printGreen("ImGui was destroyed!", "ImGui");
