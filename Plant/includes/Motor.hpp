@@ -1,8 +1,11 @@
 #pragma once
 
+#include "DRV8301.hpp"
 #include "ADC.hpp"
 
 #include "Kalman.hpp"
+
+#include "IMGUIwindow.hpp"
 
 namespace STM32 {
 
@@ -15,11 +18,24 @@ public:
     
     Motor() = default;
     
-    void start();
+    void start(Engine::IMGUIwindow* const _pIMGUIwindow_);
+    void update();
     
-    ~Motor() = default;
+    ~Motor();
     
 private:
+    const char* graphic_name = "Motor";
+    const char* line_name = "A";
+    const char* x_name = "X";
+    const char* y_name = "Y";
+    
+    float ia = 0.0f;
+    float ib = 0.0f;
+    
+    Engine::IMGUIwindow* pIMGUIwindow = nullptr;
+    std::weak_ptr<Engine::IMPLOTwindow> pIMPLOTwindow;
+    
+    DRV8301* pDRV8301 = nullptr;
     ADC* pADC = nullptr;
 };
 

@@ -74,25 +74,11 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
                 1000.0f / ImGui::GetIO().Framerate,
                 ImGui::GetIO().Framerate);
     
-    drawSignalWindow();
+    //drawSignalWindow();
     
-    t.emplace_back(sinus);
-    omega_true.emplace_back(sinus);
-    
-    ImGui::Begin("EKF Results");
-    if (ImPlot::BeginPlot("Motor Speed", ImVec2(-1, 300))) {
-        ImPlot::SetupAxes("time (s)", "omega (rad/s)");
-        ImPlot::PlotLine("True", t.data(), omega_true.data(), N);
-        ImPlot::PlotLine("EKF", t.data(), omega_est.data(), N);
-        ImPlot::EndPlot();
+    for (auto pIMPLOTwindow : pIMPLOTwindows) {
+        pIMPLOTwindow->draw();
     }
-    if (ImPlot::BeginPlot("Rotor Angle", ImVec2(-1, 300))) {
-        ImPlot::SetupAxes("time (s)", "theta (rad)");
-        ImPlot::PlotLine("True", t.data(), theta_true.data(), N);
-        ImPlot::PlotLine("EKF",  t.data(), theta_est.data(),  N);
-        ImPlot::EndPlot();
-    }
-    ImGui::End();
     
     static bool isCameraEnable = false;
     ImGui::Checkbox("Show Camera parameters", &isCameraEnable);
@@ -163,6 +149,34 @@ void IMGUIwindow::render(Camera* _pCamera_,
     ImGui::Render();
     
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+}
+
+void IMPLOTwindow::draw() {
+    ImGui::Begin(graphic_name);
+    
+    if (ImPlot::BeginPlot(graphic_name, ImVec2(-1, 300))) {
+        ImPlot::SetupAxes(x_axis_name, y_axis_name);
+        //ImPlot::SetupAxes("t", "omega",
+          //                    ImPlotAxisFlags_AutoFit,   // X — авто
+            //                  ImPlotAxisFlags_AutoFit);
+        ImPlot::PlotLine(line_name, X_axis.data(), Y_axis.data(), (int)(X_axis.size()));
+        ImPlot::EndPlot();
+    }
+    ImGui::End();
+    
+    X_axis.emplace_back(count);
+    count++;
+}
+
+std::weak_ptr<IMPLOTwindow> IMGUIwindow::create_ImPlot_window(const char* _graphic_name_,
+                                                              const char* _line_name_,
+                                                              const char* _x_axis_name_,
+                                                              const char* _y_axis_name_)
+{
+    std::shared_ptr<IMPLOTwindow> pIMPLOTwindow = std::make_shared<IMPLOTwindow>(_graphic_name_, _line_name_, _x_axis_name_, _y_axis_name_);
+    
+    pIMPLOTwindows.emplace_back(pIMPLOTwindow);
+    return pIMPLOTwindow;
 }
 
 void IMGUIwindow::drawSignalWindow() {

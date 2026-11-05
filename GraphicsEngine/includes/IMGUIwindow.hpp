@@ -14,6 +14,34 @@
 
 namespace Engine {
 
+class IMPLOTwindow {
+public:
+    IMPLOTwindow(const char* _graphic_name_ = " ",
+                 const char* _line_name_ = " ",
+                 const char* _x_axis_name_ = " ",
+                 const char* _y_axis_name_ = " ") :
+    graphic_name(_graphic_name_),
+    line_name(_line_name_),
+    x_axis_name(_x_axis_name_),
+    y_axis_name(_y_axis_name_) {}
+    
+    ~IMPLOTwindow() = default;
+    
+    void draw();
+    void set_value(float value) { Y_axis.emplace_back(value); }
+    
+private:
+    const char* graphic_name;
+    const char* line_name;
+    const char* x_axis_name;
+    const char* y_axis_name;
+    
+    std::vector<float> X_axis;
+    std::vector<float> Y_axis;
+    
+    uint32_t count = 0;
+};
+
 class IMGUIwindow {
 public:
     IMGUIwindow(VulkanResources* _pVulkanResources_,
@@ -28,6 +56,11 @@ public:
     void render(Camera* _pCamera_,
                 VkCommandBuffer& commandBuffer);
     void setGraphicsObject(std::shared_ptr<GraphicsObject> pGraphicsObject);
+    
+    std::weak_ptr<IMPLOTwindow> create_ImPlot_window(const char* _graphic_name_,
+                                                     const char* _line_name_,
+                                                     const char* _x_axis_name_,
+                                                     const char* _y_axis_name_);
     
     ~IMGUIwindow();
     
@@ -44,15 +77,9 @@ private:
     Audio* pAudio;
     std::vector<std::shared_ptr<GraphicsObject>> pGraphicsObjects;
     
-    float sinus = 1;
+    std::vector<std::shared_ptr<IMPLOTwindow>> pIMPLOTwindows;
     
-    std::vector<float> t;
-    std::vector<float> omega_true;
-    std::vector<float> omega_est;
-    std::vector<float> theta_true;
-    std::vector<float> theta_est;
-    
-    int N = 0;
+    float sinus = 1.0f;
 };
 
 }

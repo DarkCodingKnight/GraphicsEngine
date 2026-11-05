@@ -28,6 +28,10 @@ void Application::start() {
     //pArrow = pObjectPool.lock()->createGraphicsObject(ARROW_MODEL_PATH, ARROW_TEXTURE_PATH, "Arrow");
     //pLowPoyTree = pObjectPool.lock()->createGraphicsObject(LOWPOLYTREE_MODEL_PATH, LOWPOLYTREE_TEXTURE_PATH, "Tree");
     
+    // Motor initializing
+    pMotor = new STM32::Motor();
+    pMotor->start(pGraphicsApplication->get_IMGUI());
+    
     mainLoop();
 }
 
@@ -37,6 +41,8 @@ void Application::mainLoop() {
         //pLowPoyTree.lock()->draw();
         pDesert.lock()->draw();
         pTree.lock()->draw();
+        
+        pMotor->update();
     }
 }
 

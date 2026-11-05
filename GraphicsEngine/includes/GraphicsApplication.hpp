@@ -35,6 +35,7 @@ public:
     
     std::weak_ptr<GraphicsObjectPool> createGraphicsObjectPool(ObjectPoolInfo* pPoolInfo);
     
+    IMGUIwindow* get_IMGUI() { return pIMGUIwindow; }
     bool getKeyPressed(float keyNumber) { return pResourceManager->getKeyPressed(keyNumber); }
     void playSound(const char* soundName) { if (pAudio != nullptr) pAudio->playSoundSource(soundName); }
     

@@ -7,6 +7,7 @@ set(EDITOR_INCLUDES
     includes/ADC.hpp
     includes/PI.hpp
     includes/DRV8301.hpp
+    includes/Math/Math.hpp
 )
 
 set(EDITOR_SOURCES

@@ -17,10 +17,17 @@ public:
     
     void start();
     
-    ~Application() { pGraphicsApplication.reset(); };
+    ~Application() {
+        pGraphicsApplication.reset();
+        
+        delete pMotor;
+        pMotor = nullptr;
+    };
     
 private:
     void mainLoop();
+    
+    STM32::Motor* pMotor = nullptr;
     
     std::unique_ptr<Engine::GraphicsApplication> pGraphicsApplication;
     std::weak_ptr<Engine::GraphicsObjectPool> pObjectPool;
@@ -36,8 +43,8 @@ private:
     
     const char* APPLICATION_NAME = "Hello world!";
     const uint16_t MAX_FRAMES_IN_FLIGHT = 2;
-    const uint16_t WINDOW_WIDTH = 500;
-    const uint16_t WINDOW_HEIGHT = 500;
+    const uint16_t WINDOW_WIDTH = 1000;
+    const uint16_t WINDOW_HEIGHT = 600;
     const std::string VERTEX_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/shaders/vert.spv";
     const std::string FRAGMENT_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/shaders/frag.spv";
     
