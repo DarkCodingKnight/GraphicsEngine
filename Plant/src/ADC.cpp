@@ -14,13 +14,13 @@ void ADC::get_values(float& ia, float& ib) {
 
 uint32_t ADC::get_adc_value(ADC_RANKS rank) {
     if (rank == ADC_RANKS::ADC_RANK_1) {
-        return 2048 + (rand() % 11 - 50);
+        return 2048 + (rand() % 501 - 500);
     }
     else if (rank == ADC_RANKS::ADC_RANK_2) {
-        return 2048 + (rand() % 11 - 50);
+        return 2048 + (rand() % 501 - 500);
     }
     else if (rank == ADC_RANKS::ADC_RANK_3) {
-        return 400 + (rand() % 11 - 15);
+        return 400 + (rand() % 101 - 100);
     }
 }
 

@@ -25,9 +25,11 @@ public:
     PI_controller& operator=(PI_controller&& other) = delete;
     
     PI_controller(PI_Current_Values* const _pCurrentValues_,
-                  ADC* const _pADC_) :
+                  ADC* const _pADC_,
+                  float max_modulation_index) :
     pCurrentValues(_pCurrentValues_),
-    pADC(_pADC_) {}
+    pADC(_pADC_),
+    MAX_MODULATION_INDEX(max_modulation_index) {}
     
     void calculate(float& id,
                    float& iq,
@@ -47,7 +49,7 @@ private:
     PI_Current_Values* pCurrentValues = nullptr;
     ADC* pADC = nullptr;
     
-    float MAX_MODULATION_INDEX = 0.95f;
+    float MAX_MODULATION_INDEX = 0.0f;
     
     float voltage_saturation = 0.0f;
     float D_integral_value = 0.0f;

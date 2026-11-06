@@ -29,6 +29,9 @@ public:
                 float i_alpha,
                 float i_beta);
     
+    float get_speed();
+    float get_angle();
+    
     ~Kalman() {
         pKalmanValues = nullptr;
     }
@@ -36,7 +39,7 @@ public:
 private:
     void prediction();
     void correction();
-    glm::mat2x2 inverse2x2(glm::mat2x2& M);
+    glm::mat2x2 inverse2x2(const glm::mat2x2& M);
     
     KalmanValues* pKalmanValues = nullptr;
     

@@ -2,6 +2,14 @@
 
 namespace STM32 {
 
+float Kalman::get_speed() {
+    return x[2];
+}
+
+float Kalman::get_angle() {
+    return x[3];
+}
+
 void Kalman::init() {
     // Вектор состояния
     // i_alpha, i_beta, speed, angle
@@ -128,7 +136,7 @@ void Kalman::correction() {
     P = P - K * (H * P);
 }
 
-glm::mat2x2 inverse2x2(glm::mat2x2& M) {
+glm::mat2x2 Kalman::inverse2x2(const glm::mat2x2& M) {
     float det = M[0][0] * M[1][1] - M[0][1] * M[1][0];
     if (fabsf(det) < 1e-12f) return glm::mat2x2(0.0f);
     float inv_det = 1.0f / det;

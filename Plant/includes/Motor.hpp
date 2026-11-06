@@ -25,16 +25,17 @@ public:
     
 private:
     const char* graphic_name = "Motor";
-    const char* line_name = "A";
     const char* x_name = "X";
     const char* y_name = "Y";
+    
+    float MAX_MODULATION_INDEX = 0.95f;
     
     float ia = 0.0f;
     float ib = 0.0f;
     float id = 0.0f;
     float iq = 0.0f;
     float id_ref = 0.0f;
-    float iq_ref = 0.0f;
+    float iq_ref = 2.0f;
     float i_alpha = 0.0f;
     float i_beta = 0.0f;
     
@@ -48,6 +49,33 @@ private:
     
     Engine::IMGUIwindow* pIMGUIwindow = nullptr;
     std::weak_ptr<Engine::IMPLOTwindow> pIMPLOTwindow;
+    
+    // Токи
+    const char* ia_line_name = "ia";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_ia;
+    const char* ib_line_name = "ib";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_ib;
+    const char* i_alpha_line_name = "i_alpha";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_i_alpha;
+    const char* i_beta_line_name = "i_beta";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_i_beta;
+    const char* i_d_line_name = "i_d";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_i_d;
+    const char* i_q_line_name = "i_q";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_i_q;
+    
+    const char* speed_line_name = "speed";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_speed;
+    const char* angle_line_name = "angle";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_angle;
+    
+    // ШИМ
+    const char* PhA_line_name = "PhA";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_PhA;
+    const char* PhB_line_name = "PhB";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_PhB;
+    const char* PhC_line_name = "PhC";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_PhC;
     
     DRV8301* pDRV8301 = nullptr;
     ADC* pADC = nullptr;

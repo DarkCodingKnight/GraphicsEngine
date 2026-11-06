@@ -76,7 +76,7 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
     
     //drawSignalWindow();
     
-    for (auto pIMPLOTwindow : pIMPLOTwindows) {
+    for (auto& pIMPLOTwindow : pIMPLOTwindows) {
         pIMPLOTwindow->draw();
     }
     
@@ -86,7 +86,7 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
     static bool isAudioEnable = false;
     ImGui::Checkbox("Show Audio parameters", &isAudioEnable);
     
-    for (auto pGraphicsObject : pGraphicsObjects) {
+    for (auto& pGraphicsObject : pGraphicsObjects) {
         std::string object_name = "Show " + pGraphicsObject->getObjectName() + " parameters";
         ImGui::Checkbox(object_name.c_str(), pGraphicsObject->setShowWindowParameter());
     }
@@ -120,7 +120,7 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
         pAudio->setVolume(volume);
     }
     
-    for (auto pGraphicsObject : pGraphicsObjects) {
+    for (auto& pGraphicsObject : pGraphicsObjects) {
         if (*pGraphicsObject->setShowWindowParameter()) {
             std::string name = pGraphicsObject->getObjectName();
             const char* objectName = name.c_str();
@@ -151,29 +151,12 @@ void IMGUIwindow::render(Camera* _pCamera_,
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 }
 
-void IMPLOTwindow::draw() {
-    ImGui::Begin(graphic_name);
-    
-    if (ImPlot::BeginPlot(graphic_name, ImVec2(-1, 300))) {
-        ImPlot::SetupAxes(x_axis_name, y_axis_name);
-        //ImPlot::SetupAxes("t", "omega",
-          //                    ImPlotAxisFlags_AutoFit,   // X — авто
-            //                  ImPlotAxisFlags_AutoFit);
-        ImPlot::PlotLine(line_name, X_axis.data(), Y_axis.data(), (int)(X_axis.size()));
-        ImPlot::EndPlot();
-    }
-    ImGui::End();
-    
-    X_axis.emplace_back(count);
-    count++;
-}
-
 std::weak_ptr<IMPLOTwindow> IMGUIwindow::create_ImPlot_window(const char* _graphic_name_,
-                                                              const char* _line_name_,
                                                               const char* _x_axis_name_,
-                                                              const char* _y_axis_name_)
+                                                              const char* _y_axis_name_,
+                                                              float _step_)
 {
-    std::shared_ptr<IMPLOTwindow> pIMPLOTwindow = std::make_shared<IMPLOTwindow>(_graphic_name_, _line_name_, _x_axis_name_, _y_axis_name_);
+    std::shared_ptr<IMPLOTwindow> pIMPLOTwindow = std::make_shared<IMPLOTwindow>(_graphic_name_, _x_axis_name_, _y_axis_name_, _step_);
     
     pIMPLOTwindows.emplace_back(pIMPLOTwindow);
     return pIMPLOTwindow;
