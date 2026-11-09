@@ -5,8 +5,8 @@ namespace STM32 {
 void Motor::start(Engine::IMGUIwindow* const _pIMGUIwindow_) {
     pIMGUIwindow = _pIMGUIwindow_;
     
-    pDRV8301 = new DRV8301(DRV_PARAM::GAIN_40V);
     pADC = new ADC();
+    pDRV8301 = new DRV8301(pADC, DRV_PARAM::GAIN_40V);
     pPWM = new PWM(pADC, MAX_MODULATION_INDEX, ENGINE_FREQUENCY::TEN_KHZ);
     
     adc_values = {};
@@ -66,7 +66,7 @@ void Motor::start(Engine::IMGUIwindow* const _pIMGUIwindow_) {
 }
 
 void Motor::update() {
-    pADC->get_values(ia, ib, v_alpha, v_beta, speed, angle);
+    pADC->get_values(ia, ib, v_alpha, v_beta, speed, angle, pDRV8301->get_ia_offset(), pDRV8301->get_ib_offset());
     
     Math::CLARKE_transformation(i_alpha, i_beta, ia, ib, false);
     Math::PARK_transformation(id, iq, i_alpha, i_beta, angle, false);

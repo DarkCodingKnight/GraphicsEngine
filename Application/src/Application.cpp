@@ -41,7 +41,7 @@ void Application::mainLoop() {
         
         pSaw.lock()->draw();
         
-        pSaw.lock()->rotate(0.01f, false, false, true);
+        pSaw.lock()->rotate(100.0f, false, false, true);
         
         pMotor->update();
     }

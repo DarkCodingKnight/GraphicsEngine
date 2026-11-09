@@ -78,8 +78,8 @@ private:
     
     glm::vec3 scale_vec = glm::vec3(1.0f, 1.0f, 1.0f);
     glm::vec3 position_vec = glm::vec3(0.0f, 0.0f, 0.0f);
-    std::vector<float> rotation_angles;
-    std::vector<glm::vec3> rotation_axes;
+    float rotation_angle = 0.0f;
+    glm::vec3 rotation_axis_vec = glm::vec3(0.0f, 0.0f, 0.0f);
     
     std::string objectName = "";
     bool showParametersWindow = false;

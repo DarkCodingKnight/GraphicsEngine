@@ -43,8 +43,13 @@ void GraphicsObject::scale(float x_axis, float y_axis, float z_axis)
 
 void GraphicsObject::rotate(float angle, bool x_axis, bool y_axis, bool z_axis)
 {
-    rotation_angles.emplace_back(angle);
-    rotation_axes.emplace_back(glm::vec3((float)x_axis, (float)y_axis, (float)z_axis));
+    if (glm::vec3(x_axis, y_axis, z_axis) == rotation_axis_vec) {
+        rotation_angle += angle;
+    }
+    else {
+        rotation_axis_vec = glm::vec3(x_axis, y_axis, z_axis);
+        rotation_angle = angle;
+    }
 }
 
 void GraphicsObject::translate(float x_axis, float y_axis, float z_axis)
@@ -74,12 +79,9 @@ VkDescriptorSet* GraphicsObject::getDescriptorSets(glm::mat4 view_matrix,
 
 glm::mat4 GraphicsObject::getModelMatrix() {
     glm::mat4 model_matrix = glm::mat4(1.0f);
-    
+
     model_matrix = glm::scale(model_matrix, scale_vec);
-    
-    for(size_t i = 0; i < rotation_axes.size(); i++) {
-        model_matrix = glm::rotate(model_matrix, rotation_angles.at(i), rotation_axes.at(i));
-    }
+    model_matrix = glm::rotate(model_matrix, glm::radians(rotation_angle), rotation_axis_vec);
     model_matrix = glm::translate(model_matrix, position_vec);
     
     return model_matrix;

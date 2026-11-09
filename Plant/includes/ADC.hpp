@@ -37,7 +37,9 @@ public:
                     float v_alpha,
                     float v_beta,
                     float speed,
-                    float angle);
+                    float angle,
+                    uint32_t ia_offset,
+                    uint32_t ib_offset);
     float get_battery_voltage() { return battery_voltage; }
     uint32_t get_adc_value(ADC_RANKS rank,
                            float current,

@@ -7,7 +7,9 @@ void ADC::get_values(float& ia,
                      float v_alpha,
                      float v_beta,
                      float speed,
-                     float angle)
+                     float angle,
+                     uint32_t ia_offset,
+                     uint32_t ib_offset)
 {
     float ia_count = get_adc_value(ADC_RANKS::ADC_RANK_1, ia, v_alpha, speed, angle);
     float ib_count = get_adc_value(ADC_RANKS::ADC_RANK_2, ib, v_beta, speed, angle);
