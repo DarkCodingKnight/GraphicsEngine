@@ -3,6 +3,7 @@
 #include "DRV8301.hpp"
 #include "PI.hpp"
 #include "PWM.hpp"
+#include "FluxObserver.hpp"
 #include "Kalman.hpp"
 
 #include "IMGUIwindow.hpp"
@@ -59,10 +60,10 @@ private:
     std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_i_alpha;
     const char* i_beta_line_name = "i_beta";
     std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_i_beta;
-    const char* i_d_line_name = "i_d";
-    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_i_d;
-    const char* i_q_line_name = "i_q";
-    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_i_q;
+    const char* id_line_name = "id";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_id;
+    const char* iq_line_name = "iq";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_iq;
     
     const char* speed_line_name = "speed";
     std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_speed;
@@ -78,11 +79,17 @@ private:
     std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_PhC;
     
     DRV8301* pDRV8301 = nullptr;
+    
+    ADC_values adc_values;
     ADC* pADC = nullptr;
+    
     PWM* pPWM = nullptr;
     
     PI_Current_Values PI_values;
     PI_controller* pPI = nullptr;
+    
+    Flux_observer_values Flux_values;
+    FluxObserver* pFluxObserver = nullptr;
     
     KalmanValues Kalman_values;
     Kalman* pKalman = nullptr;

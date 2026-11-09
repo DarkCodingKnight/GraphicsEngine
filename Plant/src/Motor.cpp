@@ -6,8 +6,17 @@ void Motor::start(Engine::IMGUIwindow* const _pIMGUIwindow_) {
     pIMGUIwindow = _pIMGUIwindow_;
     
     pDRV8301 = new DRV8301(DRV_PARAM::GAIN_40V);
-    pADC = new ADC(pDRV8301->get_gain());
+    pADC = new ADC();
     pPWM = new PWM(pADC, MAX_MODULATION_INDEX, ENGINE_FREQUENCY::TEN_KHZ);
+    
+    adc_values = {};
+    adc_values.PHASE_RESISTANCE = 0.105f;
+    adc_values.LQ = 0.00012f;
+    adc_values.MAG_FLUX = 0.01f;
+    adc_values.TS = pPWM->get_TS();
+    adc_values.GAIN = pDRV8301->get_gain();
+    
+    pADC->set_adc_values(&adc_values);
     
     PI_values = {};
     PI_values.DKP = 3.7f / 2.0f;
@@ -21,6 +30,16 @@ void Motor::start(Engine::IMGUIwindow* const _pIMGUIwindow_) {
     PI_values.TS = pPWM->get_TS();
     
     pPI = new PI_controller(&PI_values, pADC, MAX_MODULATION_INDEX);
+    
+    Flux_values = {};
+    Flux_values.PHASE_RESISTANCE = 0.105f;
+    Flux_values.TS = pPWM->get_TS();
+    Flux_values.OBSERVER_CUTOFF_FREQUENSY = 31.4f * 5.0f;
+    Flux_values.SPEED_CUTOFF_FREQUENCY = 31.4f;
+    Flux_values.LD = 0.00012f;
+    Flux_values.LQ = 0.00012f;
+    
+    pFluxObserver = new FluxObserver(&Flux_values);
     
     Kalman_values = {};
     Kalman_values.PHASE_RESISTANCE = 0.105f;
@@ -42,12 +61,12 @@ void Motor::start(Engine::IMGUIwindow* const _pIMGUIwindow_) {
     pIMPLOTline_PhA = pIMPLOTwindow.lock()->create_IMPLOTline(PhA_line_name);
     pIMPLOTline_PhB = pIMPLOTwindow.lock()->create_IMPLOTline(PhB_line_name);
     pIMPLOTline_PhC = pIMPLOTwindow.lock()->create_IMPLOTline(PhC_line_name);
-    pIMPLOTline_i_d = pIMPLOTwindow.lock()->create_IMPLOTline(i_d_line_name);
-    pIMPLOTline_i_q = pIMPLOTwindow.lock()->create_IMPLOTline(i_q_line_name);
+    pIMPLOTline_id = pIMPLOTwindow.lock()->create_IMPLOTline(id_line_name);
+    pIMPLOTline_iq = pIMPLOTwindow.lock()->create_IMPLOTline(iq_line_name);
 }
 
 void Motor::update() {
-    pADC->get_values(ia, ib);
+    pADC->get_values(ia, ib, v_alpha, v_beta, speed, angle);
     
     Math::CLARKE_transformation(i_alpha, i_beta, ia, ib, false);
     Math::PARK_transformation(id, iq, i_alpha, i_beta, angle, false);
@@ -59,6 +78,7 @@ void Motor::update() {
     Math::PARK_transformation(v_alpha, v_beta, vd, vq, angle, true);
     
     //pKalman->update(v_alpha, v_beta, i_alpha, i_beta);
+    pFluxObserver->calculate(speed, angle, v_alpha, v_beta, i_alpha, i_beta);
     
     pPWM->calculate_space_vector(v_alpha, v_beta);
     
@@ -66,18 +86,19 @@ void Motor::update() {
     pIMPLOTline_ib.lock()->add_value(ib);
     pIMPLOTline_i_alpha.lock()->add_value(i_alpha);
     pIMPLOTline_i_beta.lock()->add_value(i_beta);
-    pIMPLOTline_i_d.lock()->add_value(id);
-    pIMPLOTline_i_q.lock()->add_value(iq);
+    pIMPLOTline_id.lock()->add_value(id);
+    pIMPLOTline_iq.lock()->add_value(iq);
     
-    //pIMPLOTline_speed.lock()->add_value(pKalman->get_speed());
-    //pIMPLOTline_angle.lock()->add_value(pKalman->get_angle());
+    pIMPLOTline_speed.lock()->add_value(speed);
+    pIMPLOTline_angle.lock()->add_value(angle);
     
     pIMPLOTline_PhA.lock()->add_value(pPWM->get_PhA());
     pIMPLOTline_PhB.lock()->add_value(pPWM->get_PhB());
     pIMPLOTline_PhC.lock()->add_value(pPWM->get_PhC());
     
-    //std::cout << pKalman->get_speed() << std::endl;
-    //std::cout << pKalman->get_angle() << std::endl;
+    std::cout << "Speed: " << speed << std::endl;
+    std::cout << "Angle: " << angle << std::endl;
+    
     std::cout << pPWM->get_PhA() << std::endl;
     std::cout << pPWM->get_PhB() << std::endl;
     std::cout << pPWM->get_PhC() << std::endl;
@@ -92,8 +113,14 @@ Motor::~Motor() {
     delete pADC;
     pADC = nullptr;
     
+    delete pPWM;
+    pPWM = nullptr;
+    
     delete pPI;
     pPI = nullptr;
+    
+    delete pFluxObserver;
+    pFluxObserver = nullptr;
     
     delete pKalman;
     pKalman = nullptr;

@@ -28,6 +28,7 @@ set(ENGINE_PRIVATE_INCLUDES
 	#includes/RenderTargetManager.hpp
 	includes/Camera.hpp
 	includes/IMGUIwindow.hpp
+	includes/IMPLOTwindow.hpp
 	includes/Audio.hpp
 	includes/Lighting.hpp
 )
@@ -50,6 +51,7 @@ set(ENGINE_PRIVATE_SOURCES
 	#src/RenderTargetManager.cpp
 	src/Camera.cpp
 	src/IMGUIwindow.cpp
+	src/IMPLOTwindow.cpp
 	src/Audio.cpp
 	src/Lighting.cpp
 )

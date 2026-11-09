@@ -162,34 +162,6 @@ std::weak_ptr<IMPLOTwindow> IMGUIwindow::create_ImPlot_window(const char* _graph
     return pIMPLOTwindow;
 }
 
-void IMGUIwindow::drawSignalWindow() {
-    static float history[256] = {};
-    static int head = 0;
-    
-    history[head] = sinus;
-    head = (head + 1) % 256;
-    
-    sinus = sin(sinus);
-    if (sinus <= 0.1f) sinus = 1.0f;
-    
-    ImGui::Begin("Signal");
-    ImVec2 p = ImGui::GetCursorScreenPos();
-    ImVec2 size(300, 100);
-    ImDrawList* dl = ImGui::GetWindowDrawList();
-    
-    dl->AddRectFilled(p, ImVec2(p.x + size.x, p.y + size.y), IM_COL32(30, 30, 30, 25));
-    
-    for (int i = 0; i < 255; ++i) {
-        float y0 = p.y + size.y * (1.0f - history[(head + i) % 256]);
-        float y1 = p.y + size.y * (1.0f - history[(head + i + 1) % 256]);
-        
-        dl->AddLine(ImVec2(p.x + i, y0), ImVec2(p.x + i + 1, y1), IM_COL32(0, 255, 0, 255));
-    }
-    
-    //ImGui::Dummy(size);
-    ImGui::End();
-}
-
 IMGUIwindow::~IMGUIwindow() {
     vkDeviceWaitIdle(pVulkanResources->getLogicalDevice());
     

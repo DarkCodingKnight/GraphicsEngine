@@ -39,6 +39,11 @@ private:
     std::weak_ptr<Engine::GraphicsObject> pArrow;
     std::weak_ptr<Engine::GraphicsObject> pLowPoyTree;
     
+    std::weak_ptr<Engine::GraphicsObject> pRotor;
+    std::weak_ptr<Engine::GraphicsObject> pStator;
+    
+    std::weak_ptr<Engine::GraphicsObject> pSaw;
+    
     bool enable_validation_layers = false;
     
     const char* APPLICATION_NAME = "Hello world!";
@@ -66,6 +71,12 @@ private:
     
     //const char* TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/VikingRoom/VikingRoomTexture.png";
     //const char* MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/VikingRoom/VikingRoomModel.obj";
+    
+    const char* ROTOR_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Motor/Rotor.obj";
+    const char* STATOR_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Motor/Stator.obj";
+    
+    const char* SAW_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Platforms/Models/saw.obj";
+    const char* SAW_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Platforms/Models/Textures/colormap.png";
 };
 
 }

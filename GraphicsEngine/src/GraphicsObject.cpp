@@ -47,7 +47,8 @@ void GraphicsObject::rotate(float angle, bool x_axis, bool y_axis, bool z_axis)
     rotation_axes.emplace_back(glm::vec3((float)x_axis, (float)y_axis, (float)z_axis));
 }
 
-void GraphicsObject::translate(float x_axis, float y_axis, float z_axis) {
+void GraphicsObject::translate(float x_axis, float y_axis, float z_axis)
+{
     position_vec += glm::vec3(x_axis, y_axis, z_axis);
 }
 
@@ -79,7 +80,6 @@ glm::mat4 GraphicsObject::getModelMatrix() {
     for(size_t i = 0; i < rotation_axes.size(); i++) {
         model_matrix = glm::rotate(model_matrix, rotation_angles.at(i), rotation_axes.at(i));
     }
-    
     model_matrix = glm::translate(model_matrix, position_vec);
     
     return model_matrix;
@@ -121,7 +121,6 @@ void GraphicsObject::createDescriptorSets(const VkDescriptorPool& descriptorPool
         uniformBufferDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         uniformBufferDescriptorWrite.descriptorCount = 1;
         uniformBufferDescriptorWrite.pBufferInfo = &uniformBufferInfo;
-        
         
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
