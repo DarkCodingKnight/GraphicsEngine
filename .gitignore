@@ -2,4 +2,5 @@ GraphicsEngine/src/RenderTargetManager.cpp
 GraphicsEngine/includes/RenderTargetManager.hpp
 GraphicsEngine/external/
 GraphicsEngine/sounds
+.qtcreator/
 build/
