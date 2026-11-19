@@ -59,6 +59,11 @@ private:
     float max_voltage = 3.3f;
     float one_by_shunt_resistance = 2000.0f;
     float inverse_resistance_divider_value = 18.7272f;
+
+    float i_alpha_state = 0.0f;
+    float i_beta_state = 0.0f;
+    float ia_count = 0.0f;
+    float ib_count = 0.0f;
 };
 
 }
