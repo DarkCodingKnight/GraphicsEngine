@@ -43,13 +43,17 @@ void GraphicsObject::scale(float x_axis, float y_axis, float z_axis)
 
 void GraphicsObject::rotate(float angle, bool x_axis, bool y_axis, bool z_axis)
 {
-    if (glm::vec3(x_axis, y_axis, z_axis) == rotation_axis_vec) {
+    if (glm::vec3(x_axis, y_axis, z_axis) == rotation_angle_vec) {
         rotation_angle += angle;
     }
     else {
-        rotation_axis_vec = glm::vec3(x_axis, y_axis, z_axis);
+        rotation_angle_vec = glm::vec3(x_axis, y_axis, z_axis);
         rotation_angle = angle;
     }
+
+    //if (x_axis) rotation_angle_x += angle;
+    //if (y_axis) rotation_angle_y += angle;
+    //if (z_axis) rotation_angle_z += angle;
 }
 
 void GraphicsObject::translate(float x_axis, float y_axis, float z_axis)
@@ -63,8 +67,8 @@ VkDescriptorSet* GraphicsObject::getDescriptorSets(glm::mat4 view_matrix,
 {
     static auto startTime = std::chrono::high_resolution_clock::now();
     
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+    //auto currentTime = std::chrono::high_resolution_clock::now();
+    //float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
     
     UniformBufferObject ubo{};
     ubo.model = getModelMatrix();
@@ -81,7 +85,9 @@ glm::mat4 GraphicsObject::getModelMatrix() {
     glm::mat4 model_matrix = glm::mat4(1.0f);
 
     model_matrix = glm::scale(model_matrix, scale_vec);
-    model_matrix = glm::rotate(model_matrix, glm::radians(rotation_angle), rotation_axis_vec);
+    model_matrix = glm::rotate(model_matrix, glm::radians(rotation_angle), rotation_angle_vec);
+    //model_matrix = glm::rotate(model_matrix, glm::radians(rotation_angle_y), glm::vec3(0.0f, 1.0f, 0.0f));
+    //model_matrix = glm::rotate(model_matrix, glm::radians(rotation_angle_z), glm::vec3(0.0f, 0.0f, 1.0f));
     model_matrix = glm::translate(model_matrix, position_vec);
     
     return model_matrix;
