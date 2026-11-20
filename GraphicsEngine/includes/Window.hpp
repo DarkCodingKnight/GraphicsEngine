@@ -25,9 +25,7 @@ public:
 class WindowInterface {
 public:
     WindowInterface() = default;
-    
     virtual void updateWindow() = 0;
-    
     virtual ~WindowInterface() = default;
 };
 
@@ -38,10 +36,10 @@ public:
     
     bool isWindowClose();
     
-    GLFWwindow* getGLFWwindowPtr() { return pGLFWWindow; };
+    GLFWwindow* getGLFWwindowPtr() const { return pGLFWWindow; };
     
     void setFramebufferUpdateSubscribers(WindowInterface* pObject);
-    std::vector<WindowInterface*> getFramebufferUpdateObjects() { return pFramebufferUpdateSubscribers; };
+    std::vector<WindowInterface*> getFramebufferUpdateObjects() const { return pFramebufferUpdateSubscribers; };
     
     static void framebufferResizeCallback(GLFWwindow* pWindow, int width, int height) {
         auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(pWindow));

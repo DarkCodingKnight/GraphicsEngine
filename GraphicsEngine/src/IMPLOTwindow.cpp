@@ -38,7 +38,7 @@ void IMPLOTwindow::draw() {
                                     offset * step,
                                     (total - 1) * step,
                                     cond);
-            ImPlot::SetupAxisLimits(ImAxis_Y1, -2500, 2500, cond);
+            //ImPlot::SetupAxisLimits(ImAxis_Y1, -300, 300, cond);
 
             for (auto& p : pIMPLOTlines) {
                 p->draw(count, step, offset);

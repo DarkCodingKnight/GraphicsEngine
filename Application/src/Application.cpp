@@ -40,7 +40,7 @@ void Application::mainLoop() {
         //pTree.lock()->draw();
         
         pSaw.lock()->draw();
-        pSaw.lock()->rotate(1.0f, false, false, true);
+        pSaw.lock()->rotate(0.5f, false, false, true);
         pMotor->update();
     }
 }

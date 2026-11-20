@@ -63,6 +63,8 @@ void Motor::start(Engine::IMGUIwindow* const _pIMGUIwindow_) {
     pIMPLOTline_PhC = pIMPLOTwindow.lock()->create_IMPLOTline(PhC_line_name);
     pIMPLOTline_id = pIMPLOTwindow.lock()->create_IMPLOTline(id_line_name);
     pIMPLOTline_iq = pIMPLOTwindow.lock()->create_IMPLOTline(iq_line_name);
+    pIMPLOTline_id_ref = pIMPLOTwindow.lock()->create_IMPLOTline(id_ref_line_name);
+    pIMPLOTline_iq_ref = pIMPLOTwindow.lock()->create_IMPLOTline(iq_ref_line_name);
 }
 
 void Motor::update() {
@@ -88,6 +90,8 @@ void Motor::update() {
     pIMPLOTline_i_beta.lock()->add_value(i_beta);
     pIMPLOTline_id.lock()->add_value(id);
     pIMPLOTline_iq.lock()->add_value(iq);
+    pIMPLOTline_id_ref.lock()->add_value(id_ref);
+    pIMPLOTline_iq_ref.lock()->add_value(iq_ref);
     
     pIMPLOTline_speed.lock()->add_value(speed);
     pIMPLOTline_angle.lock()->add_value(angle);

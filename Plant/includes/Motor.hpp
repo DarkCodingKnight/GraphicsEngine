@@ -64,6 +64,10 @@ private:
     std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_id;
     const char* iq_line_name = "iq";
     std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_iq;
+    const char* id_ref_line_name = "id_ref";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_id_ref;
+    const char* iq_ref_line_name = "iq_ref";
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_iq_ref;
     
     const char* speed_line_name = "speed";
     std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_speed;

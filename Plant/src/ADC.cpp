@@ -9,8 +9,8 @@ void ADC::get_values(float& ia, float& ib, float v_alpha, float v_beta,
     // 1. Физическая симуляция мотора (метод Эйлера)
     // Считаем изменение тока за шаг времени TS (dI = V/L * dt)
 
-    v_alpha = 5.0f;
-    v_beta = 0.0f;
+    v_alpha = 0.0f;
+    v_beta = 5.0f;
 
     // Ось Alpha
     float bemf_alpha = speed * pADC_values->MAG_FLUX * sin(angle);
