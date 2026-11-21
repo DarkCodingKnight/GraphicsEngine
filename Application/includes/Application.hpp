@@ -77,6 +77,9 @@ private:
     
     const char* SAW_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Platforms/Models/saw.obj";
     const char* SAW_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/Platforms/Models/Textures/colormap.png";
+
+    const char* MOTOR_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/electric-motor-obj/electric-motor.obj";
+    const char* MOTOR_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/electric-motor-obj/electric-motor_body_basecolor.jpg";
 };
 
 }

@@ -68,7 +68,7 @@ void ResourceManager::loadModel(const char* modelPath,
     std::vector<tinyobj::material_t> materials;
     std::string warn;
     std::string err;
-    
+
     if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelPath)) {
         std::string errorMessage = "Failed to load model! " + err;
         ConsoleText::printError(errorMessage, "Resource manager");
@@ -78,24 +78,24 @@ void ResourceManager::loadModel(const char* modelPath,
         for (const auto& shape : shapes) {
             for (const auto& index : shape.mesh.indices) {
                 Vertex vertex{};
-                
+
                 vertex.pos = {
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
                     attrib.vertices[3 * index.vertex_index + 2]
                 };
-                
-                vertex.texCoord = {
-                    attrib.texcoords[2 * index.texcoord_index + 0],
-                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-                };
-                
-                vertex.color = {
-                    attrib.colors[3 * index.vertex_index + 0],
-                    attrib.colors[3 * index.vertex_index + 1],
-                    attrib.colors[3 * index.vertex_index + 2]
-                };
-                
+
+                if (index.texcoord_index >= 0) {
+                    vertex.texCoord = {
+                        attrib.texcoords[2 * index.texcoord_index + 0],
+                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+                    };
+                } else {
+                    vertex.texCoord = {0.0f, 0.0f};
+                }
+
+                vertex.color = {1.0f, 1.0f, 1.0f};
+
                 (*pVertices).emplace_back(vertex);
                 (*indices).emplace_back(static_cast<uint32_t>((*indices).size()));
             }

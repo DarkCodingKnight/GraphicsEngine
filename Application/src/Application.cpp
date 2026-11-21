@@ -23,7 +23,7 @@ void Application::start() {
     //pTree.lock()->scale(-0.995f, -0.995f, -0.995f);
     //pDesert = pObjectPool.lock()->createGraphicsObject(DESERT_MODEL_PATH, DESERT_TEXTURE_PATH, "Desert");
     
-    pSaw = pObjectPool.lock()->createGraphicsObject(SAW_MODEL_PATH, SAW_TEXTURE_PATH, "Saw");
+    pSaw = pObjectPool.lock()->createGraphicsObject(MOTOR_MODEL_PATH, MOTOR_TEXTURE_PATH, "Motor");
     
     // Motor initializing
     pMotor = new STM32::Motor();
@@ -40,7 +40,7 @@ void Application::mainLoop() {
         //pTree.lock()->draw();
         
         pSaw.lock()->draw();
-        pSaw.lock()->rotate(0.5f, false, false, true);
+        pSaw.lock()->rotate(0.0f, false, false, true);
         pMotor->update();
     }
 }
