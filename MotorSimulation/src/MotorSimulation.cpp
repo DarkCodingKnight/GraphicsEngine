@@ -26,6 +26,8 @@ void MotorSimulation::init() {
 }
 
 void MotorSimulation::start() {
+    pAudioManager.lock()->play_open_sound();
+
     while (pGraphicsApplication->updateGraphicsApplication()) {
         pMotor->draw();
         pMotor->update();
