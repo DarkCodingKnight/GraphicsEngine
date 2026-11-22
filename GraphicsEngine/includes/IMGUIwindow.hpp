@@ -56,8 +56,8 @@ public:
 private:
     std::string name = "";
 
-    std::vector<std::shared_ptr<SliderFloat>> pSlidersFloat;
-    std::vector<std::shared_ptr<DataFloat>> pDataFloat;
+    std::vector<std::shared_ptr<SliderFloat>> pSliderFloats;
+    std::vector<std::shared_ptr<DataFloat>> pDataFloats;
 };
 
 }

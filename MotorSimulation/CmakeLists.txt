@@ -1,6 +1,7 @@
-set(PROJECT_NAME Plant)
+set(PROJECT_NAME MotorSimulation)
 
 set(EDITOR_INCLUDES
+    includes/MotorSimulation.hpp
     includes/Motor.hpp
     includes/Kalman.hpp
     includes/PWM.hpp
@@ -12,6 +13,7 @@ set(EDITOR_INCLUDES
 )
 
 set(EDITOR_SOURCES
+    src/MotorSimulation.cpp
     src/Motor.cpp
     src/Kalman.cpp
     src/PWM.cpp

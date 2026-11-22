@@ -4,7 +4,7 @@ namespace Engine {
 
 IMGUImanager::IMGUImanager(VulkanResources* const _pVulkanResources_,
                            SwapChain* const _pSwapChain_,
-                           DescriptorResources const _pDescriptorResources_,
+                           DescriptorResources* const _pDescriptorResources_,
                            GLFWwindow* const _pGLFWwindow_) :
     pVulkanResources(_pVulkanResources_),
     pSwapChain(_pSwapChain_),
@@ -35,15 +35,13 @@ void IMGUImanager::init(DescriptorResources* const _pDescriptorResources_) {
     init_info.QueueFamily = pVulkanResources->getQueueFamilyIndices().graphicsFamily.value();
     init_info.Queue = pVulkanResources->getGraphicsQueue();
 
-    pIMGUIDescriptorPool = _pDescriptorResources_->getIMGUIDescriptorPool();
-
-    init_info.DescriptorPool = pIMGUIDescriptorPool->getdescriptorPool();
+    init_info.DescriptorPool = _pDescriptorResources_->getIMGUIDescriptorPool()->getdescriptorPool();
     init_info.MinImageCount = static_cast<uint32_t>(pSwapChain->getSwapChainImageViews().size());
     init_info.ImageCount = static_cast<uint32_t>(pSwapChain->getSwapChainImageViews().size());
     //init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     init_info.CheckVkResultFn = nullptr;
 
-    init_info.PipelineInfoMain.RenderPass = renderPass;
+    init_info.PipelineInfoMain.RenderPass = pSwapChain->getSwapChainRenderPass();
     init_info.PipelineInfoMain.Subpass = 0;
     init_info.PipelineInfoMain.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
@@ -56,7 +54,7 @@ void IMGUImanager::init(DescriptorResources* const _pDescriptorResources_) {
     ConsoleText::printGreen("ImGui was initialized!", "IMGUImanager");
 }
 
-void IMGUIwindow::beginFrame(Camera* _pCamera_,
+void IMGUImanager::beginFrame(Camera* _pCamera_,
                              float window_width,
                              float window_height)
 {
@@ -69,7 +67,7 @@ void IMGUIwindow::beginFrame(Camera* _pCamera_,
     for (auto pIMGUIwindow : pIMGUIwindows) { pIMGUIwindow->draw(); }
 }
 
-void IMGUIwindow::render(Camera* _pCamera_,
+void IMGUImanager::render(Camera* _pCamera_,
                          VkCommandBuffer& commandBuffer) {
     ImGui::Render();
 
@@ -77,8 +75,8 @@ void IMGUIwindow::render(Camera* _pCamera_,
 }
 
 std::weak_ptr<IMGUIwindow> IMGUImanager::create_IMGUIwindow(std::string _name_) {
-    std::shared_ptr<IMGUIwindow> pIMGUIwindow = std::shared_ptr<IMGUIwindow>(_name_);
-    pIMGUIwindow.emplace_back(pIMGUIwindow);
+    std::shared_ptr<IMGUIwindow> pIMGUIwindow = std::make_shared<IMGUIwindow>(_name_);
+    pIMGUIwindows.emplace_back(pIMGUIwindow);
     return pIMGUIwindow;
 }
 
@@ -97,7 +95,7 @@ std::weak_ptr<IMPLOTwindow> IMGUImanager::create_IMPLOTwindow(const char* _graph
 
 void IMGUImanager::cleanup() {
     for (auto pIMGUIwindow : pIMGUIwindows) { pIMGUIwindow.reset(); }
-    for (auto pIMPLOTwindow : pIMPLOTwindow) { pIMPLOTwindow.reset(); }
+    for (auto pIMPLOTwindow : pIMPLOTwindows) { pIMPLOTwindow.reset(); }
 }
 
 IMGUImanager::~IMGUImanager() {
@@ -142,3 +140,4 @@ IMGUImanager::~IMGUImanager() {
     ImGui::SliderFloat("Position Y: ", &pGraphicsObject->getPositionVec()->y, -50.0f, 50.0f);
     ImGui::SliderFloat("Position Z: ", &pGraphicsObject->getPositionVec()->z, -50.0f, 50.0f);
     ImGui::End();
+*/

@@ -7,18 +7,21 @@ namespace Engine {
 
 class IMGUImanager {
 public:
+    IMGUImanager() = delete;
+    IMGUImanager(const IMGUImanager& other) = delete;
+    IMGUImanager(IMGUImanager&& other) = delete;
+    IMGUImanager& operator=(const IMGUImanager& other) = delete;
+    IMGUImanager& operator=(IMGUImanager&& other) = delete;
     IMGUImanager(VulkanResources* const _pVulkanResources_,
                  SwapChain* const _pSwapChain_,
                  DescriptorResources* const _pDescriptorResources_,
                  GLFWwindow* const _pGLFWwindow_);
 
-    IMGUImanager(const IMGUImanager& other) = delete;
-    IMGUImanager(IMGUImanager&& other) = delete;
-    IMGUImanager& operator=(const IMGUImanager& other) = delete;
-    IMGUImanager& operator=(IMGUImanager&& other) = delete;
-
     void init(DescriptorResources* const _pDescriptorResources_);
     void render(Camera* _pCamera_, VkCommandBuffer& commandBuffer);
+    void beginFrame(Camera* _pCamera_,
+                    float window_width,
+                    float window_height);
     std::weak_ptr<IMGUIwindow> create_IMGUIwindow(std::string _name_);
     std::weak_ptr<IMPLOTwindow> create_IMPLOTwindow(const char* _graphic_name_,
                                                     const char* _x_axis_name_,

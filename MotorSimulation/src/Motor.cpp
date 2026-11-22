@@ -2,9 +2,12 @@
 
 namespace STM32 {
 
-void Motor::start(Engine::IMGUIwindow* const _pIMGUIwindow_) {
-    pIMGUIwindow = _pIMGUIwindow_;
-    
+Motor::Motor(ObjectPool _pGraphicsObjectPool_) :
+    pGraphicsObjectPool(_pGraphicsObjectPool_) { init(); }
+
+void Motor::init() {
+    pGraphicsMotor = pGraphicsObjectPool.lock()->createGraphicsObject(MOTOR_MODEL_PATH, MOTOR_TEXTURE_PATH, name);
+
     pADC = new ADC();
     pDRV8301 = new DRV8301(pADC, DRV_PARAM::GAIN_40V);
     pPWM = new PWM(pADC, MAX_MODULATION_INDEX, ENGINE_FREQUENCY::TEN_KHZ);
@@ -48,9 +51,7 @@ void Motor::start(Engine::IMGUIwindow* const _pIMGUIwindow_) {
     Kalman_values.TS = pPWM->get_TS();
     
     pKalman = new Kalman(&Kalman_values);
-    
-    pPWM->calculate_space_vector(v_alpha, v_beta);
-    
+    /*
     pIMPLOTwindow = pIMGUIwindow->create_ImPlot_window(graphic_name, x_name, y_name, pPWM->get_TS());
     pIMPLOTline_ia = pIMPLOTwindow.lock()->create_IMPLOTline(ia_line_name);
     pIMPLOTline_ib = pIMPLOTwindow.lock()->create_IMPLOTline(ib_line_name);
@@ -64,7 +65,12 @@ void Motor::start(Engine::IMGUIwindow* const _pIMGUIwindow_) {
     pIMPLOTline_id = pIMPLOTwindow.lock()->create_IMPLOTline(id_line_name);
     pIMPLOTline_iq = pIMPLOTwindow.lock()->create_IMPLOTline(iq_line_name);
     pIMPLOTline_id_ref = pIMPLOTwindow.lock()->create_IMPLOTline(id_ref_line_name);
-    pIMPLOTline_iq_ref = pIMPLOTwindow.lock()->create_IMPLOTline(iq_ref_line_name);
+    pIMPLOTline_iq_ref = pIMPLOTwindow.lock()->create_IMPLOTline(iq_ref_line_name);*/
+}
+
+void Motor::draw() {
+    pGraphicsMotor.lock()->draw();
+    pGraphicsMotor.lock()->rotate(0.0f, true, false, false);
 }
 
 void Motor::update() {
@@ -83,7 +89,7 @@ void Motor::update() {
     pFluxObserver->calculate(speed, angle, v_alpha, v_beta, i_alpha, i_beta);
     
     pPWM->calculate_space_vector(v_alpha, v_beta);
-    
+    /*
     pIMPLOTline_ia.lock()->add_value(ia);
     pIMPLOTline_ib.lock()->add_value(ib);
     pIMPLOTline_i_alpha.lock()->add_value(i_alpha);
@@ -105,11 +111,11 @@ void Motor::update() {
     
     std::cout << pPWM->get_PhA() << std::endl;
     std::cout << pPWM->get_PhB() << std::endl;
-    std::cout << pPWM->get_PhC() << std::endl;
+    std::cout << pPWM->get_PhC() << std::endl;*/
 }
 
 Motor::~Motor() {
-    pIMGUIwindow = nullptr;
+    //pIMGUIwindow = nullptr;
     
     delete pDRV8301;
     pDRV8301 = nullptr;

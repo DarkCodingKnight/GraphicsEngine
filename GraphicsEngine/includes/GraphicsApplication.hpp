@@ -38,6 +38,7 @@ public:
     std::weak_ptr<AudioManager> create_audio_manager();
     
     bool getKeyPressed(float keyNumber) { return pResourceManager->getKeyPressed(keyNumber); }
+    bool getMouseKyPressed(float mouseKyeNumber) { return pResourceManager->getMouseKeyPressed(mouseKyeNumber); }
     bool updateGraphicsApplication();
     void cleanUpApplication();
     

@@ -72,22 +72,24 @@ std::weak_ptr<GraphicsObjectPool> GraphicsApplication::createGraphicsObjectPool(
 }
 
 std::weak_ptr<IMGUImanager> GraphicsApplication::create_IMGUI_manager() {
-    pIMGUImanager = std::shared_ptr<IMGUImanager>(pVulkanResources,
-                                                  pSwapChain,
-                                                  pDescriptorResources,
-                                                  pWindow->getGLFWwindowPtr());
-    pRenderer->set_IMGUImanager(pIMGUImanager);
+    if (pIMGUImanager == nullptr) {
+        pIMGUImanager = std::make_shared<IMGUImanager>(pVulkanResources,
+                                                       pSwapChain,
+                                                       pDescriptorResources,
+                                                       pWindow->getGLFWwindowPtr());
+        pRenderer->set_IMGUImanager(pIMGUImanager);
+    }
     return pIMGUImanager;
 }
 
 std::weak_ptr<AudioManager> GraphicsApplication::create_audio_manager() {
-    pAudioManager = std::shared_ptr<AudioManager>();
+    if (pAudioManager == nullptr) pAudioManager = std::make_shared<AudioManager>();
     return pAudioManager;
 }
 
 void GraphicsApplication::cleanUpApplication() {
-    pIMGUImanager.reset();
-    pAudioManager.reset();
+    if (pIMGUImanager) pIMGUImanager.reset();
+    if (pAudioManager) pAudioManager.reset();
 
     for(std::shared_ptr<GraphicsObjectPool> pGraphicsObjectPool : pGraphicsObjectPools) {
         for(std::shared_ptr<GraphicsObject> pGraphicsObject : pGraphicsObjectPool->getGraphicsObjects()) {
@@ -98,9 +100,6 @@ void GraphicsApplication::cleanUpApplication() {
 }
 
 GraphicsApplication::~GraphicsApplication() {
-    delete pAudio;
-    delete pIMGUImanager;
-    
     delete pCamera;
     delete pSampler;
     delete pDescriptorResources;
@@ -109,9 +108,6 @@ GraphicsApplication::~GraphicsApplication() {
     delete pVulkanResources;
     delete pWindow;
     delete pResourceManager;
-    
-    pAudio = nullptr;
-    pIMGUIwindow = nullptr;
     
     pCamera = nullptr;
     pSampler = nullptr;

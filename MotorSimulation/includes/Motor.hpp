@@ -1,30 +1,44 @@
 #pragma once
 
+#include "GraphicsApplication.hpp"
+
 #include "DRV8301.hpp"
 #include "PI.hpp"
 #include "PWM.hpp"
 #include "FluxObserver.hpp"
 #include "Kalman.hpp"
 
-#include "IMGUIwindow.hpp"
+#include "IMGUImanager.hpp"
 
 namespace STM32 {
 
+using ObjectPool = std::weak_ptr<Engine::GraphicsObjectPool>;
+using Object = std::weak_ptr<Engine::GraphicsObject>;
+
 class Motor {
 public:
+    Motor() = delete;
     Motor(const Motor& other) = delete;
     Motor(Motor&& other) = delete;
     Motor& operator=(const Motor& other) = delete;
     Motor& operator=(Motor&& other) = delete;
     
-    Motor() = default;
+    Motor(ObjectPool _pGraphicsObjectPool_);
     
-    void start(Engine::IMGUIwindow* const _pIMGUIwindow_);
+    void init();
+    void draw();
     void update();
     
     ~Motor();
     
 private:
+    ObjectPool pGraphicsObjectPool;
+    Object pGraphicsMotor;
+
+    const char* MOTOR_MODEL_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/electric-motor-obj/electric-motor.obj";
+    const char* MOTOR_TEXTURE_PATH = "/Users/user/Projects/GameEngine/GraphicsEngine/models/electric-motor-obj/electric-motor_body_basecolor.jpg";
+    const std::string name = "Motor";
+
     const char* graphic_name = "Motor";
     const char* x_name = "X";
     const char* y_name = "Y";
@@ -47,8 +61,8 @@ private:
     
     float speed = 0.0f;
     float angle = 0.0f;
-    
-    Engine::IMGUIwindow* pIMGUIwindow = nullptr;
+    /*
+    Engine::IMGUImanager* pIMGUIwindow = nullptr;
     std::weak_ptr<Engine::IMPLOTwindow> pIMPLOTwindow;
     
     // Токи
@@ -80,7 +94,7 @@ private:
     const char* PhB_line_name = "PhB";
     std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_PhB;
     const char* PhC_line_name = "PhC";
-    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_PhC;
+    std::weak_ptr<Engine::IMPLOTline> pIMPLOTline_PhC;*/
     
     DRV8301* pDRV8301 = nullptr;
     

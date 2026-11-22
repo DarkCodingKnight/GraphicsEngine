@@ -145,9 +145,9 @@ void Renderer::drawFrame(std::vector<std::shared_ptr<GraphicsObjectPool>> pGraph
     std::string message = "-------------------- Current frame: " + std::to_string(currentFrame) + " --------------------";
     ConsoleText::printGreen(message, "Renderer");
     
-    if (pIMGUIwindow != nullptr) pIMGUIwindow->beginFrame(pCamera,
-                                                          pSwapChain->getSwapChainExtent().width,
-                                                          pSwapChain->getSwapChainExtent().height);
+    if (pIMGUImanager != nullptr) pIMGUImanager->beginFrame(pCamera,
+                                                            pSwapChain->getSwapChainExtent().width,
+                                                            pSwapChain->getSwapChainExtent().height);
     
     vkWaitForFences(pVulkanResources->getLogicalDevice(), 1, &inFlightFences.at(currentFrame), VK_TRUE, UINT64_MAX);
     
@@ -264,7 +264,6 @@ Renderer::~Renderer() {
     
     pVulkanResources = nullptr;
     pCamera = nullptr;
-    pIMGUIwindow = nullptr;
 };
 
 }

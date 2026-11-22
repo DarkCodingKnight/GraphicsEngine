@@ -2,10 +2,10 @@
 
 namespace Engine {
 
-SliderFloat(std::string _name_,
-            float _lower_border_,
-            float _upper_border_,
-            float* _data_) :
+SliderFloat::SliderFloat(std::string _name_,
+                         float _lower_border_,
+                         float _upper_border_,
+                         float* _data_) :
     name(_name_),
     lower_border(_lower_border_),
     upper_border(_upper_border_),
@@ -31,16 +31,16 @@ std::weak_ptr<SliderFloat> IMGUIwindow::create_SliderFloat(std::string _name_,
                                                            float _lower_border_,
                                                            float _upper_border_,
                                                            float* _data_) {
-    std::shared<SliderFloat> pSliderFloat = std::shared<SliderFloat>(_name_,
-                                                                     _lower_border_,
-                                                                     _upper_border_,
-                                                                     _data_);
+    std::shared_ptr<SliderFloat> pSliderFloat = std::make_shared<SliderFloat>(_name_,
+                                                                          _lower_border_,
+                                                                          _upper_border_,
+                                                                          _data_);
     pSliderFloats.emplace_back(pSliderFloat);
     return pSliderFloat;
 }
 
-std::weak_ptr<DataFloat> create_DataFloat(std::string _name_) {
-    std::shared_ptr<DataFloat> pDataFloat = std::shared_ptr<DataFloat>(_name_);
+std::weak_ptr<DataFloat> IMGUIwindow::create_DataFloat(std::string _name_) {
+    std::shared_ptr<DataFloat> pDataFloat = std::make_shared<DataFloat>(_name_);
     pDataFloats.emplace_back(pDataFloat);
     return pDataFloat;
 }
@@ -50,12 +50,12 @@ void IMGUIwindow::draw() {
 
     ImGui::Begin(window_name);
 
-    for (auto pSliderFloat : pSlidersFloat) {
+    for (auto pSliderFloat : pSliderFloats) {
         pSliderFloat->draw();
     }
 
-    for (auto pTextFloat : pTextFloat) {
-        pTextFloat->draw();
+    for (auto pDataFloat : pDataFloats) {
+        pDataFloat->draw();
     }
 
     ImGui::End();

@@ -5,10 +5,10 @@ bool enableValidationLayers = false;
 bool enableValidationLayers = true;
 #endif
 
-#include "Application.hpp"
+#include "MotorSimulation.hpp"
 
 int main(int args, char** argv) {
-    EngineEditor::Application app(enableValidationLayers);
+    STM32::MotorSimulation app = STM32::MotorSimulation();
     
     try {
         app.start();
@@ -21,20 +21,3 @@ int main(int args, char** argv) {
     
     return EXIT_SUCCESS;
 }
-
-//const std::vector<Engine::Vertex> vertices = {
-//    {{-0.5f,-0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f }},
-//    {{ 0.5f,-0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }},
-//    {{ 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f }},
-//    {{-0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }},
-//
-//    {{-0.5f,-0.5f,-0.5f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f }},
-//    {{ 0.5f,-0.5f,-0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f }},
-//    {{ 0.5f, 0.5f,-0.5f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f }},
-//    {{-0.5f, 0.5f,-0.5f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f }}
-//};
-//
-//const std::vector<uint16_t> indices = {
-//    0, 1, 2, 2, 3, 0,
-//    4, 5, 6, 6, 7, 4
-//};
