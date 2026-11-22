@@ -14,11 +14,12 @@ namespace Engine {
 
 class Audio {
 public:
+    Audio();
+
     Audio(const Audio& other) = delete;
     Audio(Audio&& other) = delete;
     Audio& operator=(const Audio& other) = delete;
     Audio& operator=(Audio&& other) = delete;
-    Audio();
     
     void playSoundSource(const char* sound_name);
     void setVolume(float volume) { soloud.setGlobalVolume(volume); };

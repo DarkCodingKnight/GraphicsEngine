@@ -2,9 +2,7 @@
 
 namespace Engine {
 
-Audio::Audio() {
-    initAudio();
-}
+Audio::Audio() { initAudio(); }
 
 void Audio::initAudio() {
     soloud = SoLoud::Soloud();

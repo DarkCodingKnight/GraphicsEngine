@@ -43,21 +43,7 @@ GraphicsApplication::GraphicsApplication(GraphicsApplicationInfo* pAppInfo)
     pWindow->setKeyCallbackSubscribers(pResourceManager);
     
     pDescriptorResources = new DescriptorResources(pVulkanResources, pAppInfo->max_frames_in_flight);
-    
-    
-    
-    //pAudio = new Audio();
-    
-    pIMGUIwindow = new IMGUIwindow(pVulkanResources,
-                                   pSwapChain,
-                                   pDescriptorResources,
-                                   pAudio,
-                                   pWindow->getGLFWwindowPtr());
-    
-    pRenderer->setIMGUI(pIMGUIwindow);
 }
-
-
 
 bool GraphicsApplication::updateGraphicsApplication() {
     if(!pGraphicsObjectPools.empty() && !pWindow->isWindowClose()) {
@@ -76,22 +62,35 @@ std::weak_ptr<GraphicsObjectPool> GraphicsApplication::createGraphicsObjectPool(
                                                                            pDescriptorResources,
                                                                            pSampler,
                                                                            pSwapChain,
-                                                                           pIMGUIwindow,
                                                                            pRenderer->getCommandPool(),
                                                                            pPoolInfo->vertexPath,
                                                                            pPoolInfo->fragmentPath,
                                                                            pWindow->getGLFWwindowPtr(),
                                                                            pPoolInfo->max_frames_in_flight));
-    
     pGraphicsObjectPools.push_back(pObjectPool);
     return pObjectPool;
 }
 
+std::weak_ptr<IMGUImanager> GraphicsApplication::create_IMGUI_manager() {
+    pIMGUImanager = std::shared_ptr<IMGUImanager>(pVulkanResources,
+                                                  pSwapChain,
+                                                  pDescriptorResources,
+                                                  pWindow->getGLFWwindowPtr());
+    pRenderer->set_IMGUImanager(pIMGUImanager);
+    return pIMGUImanager;
+}
+
+std::weak_ptr<AudioManager> GraphicsApplication::create_audio_manager() {
+    pAudioManager = std::shared_ptr<AudioManager>();
+    return pAudioManager;
+}
+
 void GraphicsApplication::cleanUpApplication() {
-    for(std::shared_ptr<GraphicsObjectPool> pGraphicsObjectPool : pGraphicsObjectPools)
-    {
-        for(std::shared_ptr<GraphicsObject> pGraphicsObject : pGraphicsObjectPool->getGraphicsObjects())
-        {
+    pIMGUImanager.reset();
+    pAudioManager.reset();
+
+    for(std::shared_ptr<GraphicsObjectPool> pGraphicsObjectPool : pGraphicsObjectPools) {
+        for(std::shared_ptr<GraphicsObject> pGraphicsObject : pGraphicsObjectPool->getGraphicsObjects()) {
             pGraphicsObject.reset();
         }
         pGraphicsObjectPool.reset();
@@ -100,7 +99,7 @@ void GraphicsApplication::cleanUpApplication() {
 
 GraphicsApplication::~GraphicsApplication() {
     delete pAudio;
-    delete pIMGUIwindow;
+    delete pIMGUImanager;
     
     delete pCamera;
     delete pSampler;

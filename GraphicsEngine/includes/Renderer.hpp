@@ -8,7 +8,7 @@
 
 #include "GraphicsObjectPool.hpp"
 #include "Camera.hpp"
-#include "IMGUIwindow.hpp"
+#include "IMGUImanager.hpp"
 
 namespace Engine {
 
@@ -28,19 +28,14 @@ public:
                              SwapChain* pSwapChain,
                              VkCommandBuffer& commandBuffer,
                              uint32_t imageIndex);
-    
     void drawFrame(std::vector<std::shared_ptr<GraphicsObjectPool>> pGraphicsObjectPools,
                    SwapChain* pSwapChain);
-    
     void createCommandPool(VkCommandPool* pCommandPool);
     void createCommandBuffers(VkCommandPool& commandPool,
                               VkCommandBuffer* pCommandBuffer,
                               uint32_t commandBuffersSize);
-    
-    void setIMGUI(IMGUIwindow* _pIMGUIwindow_) { pIMGUIwindow = _pIMGUIwindow_; };
-    
+    void set_IMGUImanager(std::shared_ptr<IMGUImanager> _pIMGUImanager_) { pIMGUImanager = _pIMGUImanager_; };
     VkCommandPool& getCommandPool() { return commandPool; };
-    
     void updateWindow() override;
     
     ~Renderer() override;
@@ -50,7 +45,7 @@ private:
     
     VulkanResources* pVulkanResources = nullptr;
     Camera* pCamera = nullptr;
-    IMGUIwindow* pIMGUIwindow = nullptr;
+    std::shared_ptr<IMGUImanager> pIMGUImanager = nullptr;
     
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;

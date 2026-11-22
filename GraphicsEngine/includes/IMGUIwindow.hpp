@@ -1,46 +1,63 @@
 #pragma once
 
-#include "IMPLOTwindow.hpp"
+#define IMGUI_VULKAN_DEBUG_REPORT
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+#include "implot.h"
+
+#include "SwapChain.hpp"
+#include "DescriptorResources.hpp"
+#include "Camera.hpp"
+#include "Audio.hpp"
+#include "GraphicsObject.hpp"
 
 namespace Engine {
 
+class SliderFloat {
+public:
+    SliderFloat(std::string _name_,
+                float _lower_border_,
+                float _upper_border_,
+                float* _data_);
+    void draw();
+    ~SliderFloat() = default;
+
+private:
+    std::string name = "";
+    float lower_border = 0.0f;
+    float upper_border = 0.0f;
+    float* data = nullptr;
+};
+
+class DataFloat {
+public:
+    DataFloat(std::string _name_);
+    void draw();
+    ~DataFloat() = default;
+
+private:
+    std::string name = "";
+};
+
 class IMGUIwindow {
 public:
-    IMGUIwindow(VulkanResources* _pVulkanResources_,
-                SwapChain* _pSwapChain_,
-                DescriptorResources* _pDescriptorResources_,
-                Audio* _pAudio_,
-                GLFWwindow* _pGLFWwindow_);
+    IMGUIwindow(std::string _name_);
     
-    void beginFrame(Camera* _pCamera_,
-                    float window_width,
-                    float window_height);
-    void render(Camera* _pCamera_,
-                VkCommandBuffer& commandBuffer);
-    void setGraphicsObject(std::shared_ptr<GraphicsObject> pGraphicsObject);
-    
-    std::weak_ptr<IMPLOTwindow> create_ImPlot_window(const char* _graphic_name_,
-                                                     const char* _x_axis_name_,
-                                                     const char* _y_axis_name_,
-                                                     float _step_);
-    
-    ~IMGUIwindow();
+    void draw();
+    std::weak_ptr<SliderFloat> create_SliderFloat(std::string _name_,
+                                                  float _lower_border_,
+                                                  float _upper_border_,
+                                                  float* _data_);
+    std::weak_ptr<DataFloat> create_DataFloat(std::string _name_);
+
+    ~IMGUIwindow() = default;
     
 private:
-    void initIMGUIwindow(DescriptorResources* _pDescriptorResources_,
-                         const VkRenderPass& renderPass,
-                         GLFWwindow* _pGLFWwindow_);
-    
-    std::unique_ptr<DescriptorPool> pIMGUIDescriptorPool;
-    
-    VulkanResources* pVulkanResources = nullptr;
-    SwapChain* pSwapChain = nullptr;
-    Audio* pAudio;
-    std::vector<std::shared_ptr<GraphicsObject>> pGraphicsObjects;
-    
-    std::vector<std::shared_ptr<IMPLOTwindow>> pIMPLOTwindows;
-    
-    float sinus = 1.0f;
+    std::string name = "";
+
+    std::vector<std::shared_ptr<SliderFloat>> pSlidersFloat;
+    std::vector<std::shared_ptr<DataFloat>> pDataFloat;
 };
 
 }

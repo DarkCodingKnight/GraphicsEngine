@@ -5,7 +5,7 @@
 #include "Renderer.hpp"
 #include "Camera.hpp"
 #include "DescriptorResources.hpp"
-#include "Audio.hpp"
+#include "AudioManager.hpp"
 
 namespace Engine {
 
@@ -34,11 +34,10 @@ public:
     GraphicsApplication(GraphicsApplicationInfo* pAppInfo);
     
     std::weak_ptr<GraphicsObjectPool> createGraphicsObjectPool(ObjectPoolInfo* pPoolInfo);
+    std::weak_ptr<IMGUImanager> create_IMGUI_manager();
+    std::weak_ptr<AudioManager> create_audio_manager();
     
-    IMGUIwindow* get_IMGUI() { return pIMGUIwindow; }
     bool getKeyPressed(float keyNumber) { return pResourceManager->getKeyPressed(keyNumber); }
-    void playSound(const char* soundName) { if (pAudio != nullptr) pAudio->playSoundSource(soundName); }
-    
     bool updateGraphicsApplication();
     void cleanUpApplication();
     
@@ -54,15 +53,13 @@ private:
     Sampler* pSampler = nullptr;
     Camera* pCamera = nullptr;
     
-    IMGUIwindow* pIMGUIwindow = nullptr;
-    Audio* pAudio = nullptr;
+    std::shared_ptr<IMGUImanager> pIMGUImanager = nullptr;
+    std::shared_ptr<AudioManager> pAudioManager = nullptr;
     
     std::vector<std::shared_ptr<GraphicsObjectPool>> pGraphicsObjectPools = {};
     
     int windowWidth = NULL;
     int windowHeight = NULL;
-    
-    
 };
     
 }

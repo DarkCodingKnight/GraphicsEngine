@@ -31,6 +31,7 @@ set(ENGINE_PRIVATE_INCLUDES
 	includes/IMGUImanager.hpp
 	includes/IMPLOTwindow.hpp
 	includes/Audio.hpp
+	includes/AudioManager.hpp
 	includes/Lighting.hpp
 )
 
@@ -55,6 +56,7 @@ set(ENGINE_PRIVATE_SOURCES
 	src/IMGUIwindow.cpp
 	src/IMPLOTwindow.cpp
 	src/Audio.cpp
+	src/AudioManager.cpp
 	src/Lighting.cpp
 )
 

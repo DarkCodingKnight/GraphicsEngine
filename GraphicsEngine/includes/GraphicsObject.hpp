@@ -42,11 +42,10 @@ public:
     void rotate(float angle, bool x_axis, bool y_axis, bool z_axis);
     void translate(float x_axis, float y_axis, float z_axis);
     
+    bool* setShowWindowParameter() { return &showParametersWindow; }
     std::string getObjectName() { return objectName; }
     glm::vec3* getPositionVec() { return &position_vec; };
     glm::vec3* getScaleVec() { return &scale_vec; };
-    bool* setShowWindowParameter() { return &showParametersWindow; }
-    
     uint32_t getVertexBufferSize() { return pMesh->getVerticesSize(); };
     uint32_t getIndexBufferSize() { return pMesh->getIndicesSize(); };
     VkBuffer* getVertexBufferPointer() { return pMesh->getVertexBufferPointer(); };

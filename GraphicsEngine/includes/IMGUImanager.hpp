@@ -18,7 +18,8 @@ public:
     IMGUImanager& operator=(IMGUImanager&& other) = delete;
 
     void init(DescriptorResources* const _pDescriptorResources_);
-    std::weak_ptr<IMGUIwindow> create_IMGUIwindow();
+    void render(Camera* _pCamera_, VkCommandBuffer& commandBuffer);
+    std::weak_ptr<IMGUIwindow> create_IMGUIwindow(std::string _name_);
     std::weak_ptr<IMPLOTwindow> create_IMPLOTwindow(const char* _graphic_name_,
                                                     const char* _x_axis_name_,
                                                     const char* _y_axis_name_,
@@ -27,6 +28,8 @@ public:
     ~IMGUImanager();
 
 private:
+    void cleanup();
+
     VulkanResources* pVulkanResources = nullptr;
     SwapChain* pSwapChain = nullptr;
     GLFWwindow* pGLFWwindow = nullptr;

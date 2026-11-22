@@ -83,10 +83,7 @@ void Renderer::recordCommandBuffer(std::vector<std::shared_ptr<GraphicsObjectPoo
     renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassBeginInfo.pClearValues = clearValues.data();
     
-    
     vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-    
-    
     
     for (std::shared_ptr<GraphicsObjectPool> pObjectPool : pGraphicsObjectPools)
     {
@@ -132,12 +129,7 @@ void Renderer::recordCommandBuffer(std::vector<std::shared_ptr<GraphicsObjectPoo
         }
     }
     
-    for (auto pGraphicsObjectPool : pGraphicsObjectPools) {
-        
-    }
-    
-    if (pIMGUIwindow != nullptr) pIMGUIwindow->render(pCamera, commandBuffer);
-    
+    if (pIMGUImanager != nullptr) pIMGUImanager->render(pCamera, commandBuffer);
     
     vkCmdEndRenderPass(commandBuffer);
     

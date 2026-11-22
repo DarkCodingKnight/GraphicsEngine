@@ -2,124 +2,63 @@
 
 namespace Engine {
 
-IMGUIwindow::IMGUIwindow() {}
+SliderFloat(std::string _name_,
+            float _lower_border_,
+            float _upper_border_,
+            float* _data_) :
+    name(_name_),
+    lower_border(_lower_border_),
+    upper_border(_upper_border_),
+    data(_data_) {}
 
-void IMGUIwindow::beginFrame(Camera* _pCamera_,
-                             float window_width,
-                             float window_height)
-{
-    ImGui_ImplVulkan_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    
-    ImGui::NewFrame();
-    
-    ImGui::Begin("Vulkan engine VERSION_1.2");
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                1000.0f / ImGui::GetIO().Framerate,
-                ImGui::GetIO().Framerate);
-    
-    //drawSignalWindow();
-    
-    for (auto& pIMPLOTwindow : pIMPLOTwindows) {
-        pIMPLOTwindow->draw();
+void SliderFloat::draw() {
+    const char* slider_name = name.c_str();
+
+    ImGui::SliderFloat(slider_name, data, lower_border, upper_border);
+}
+
+DataFloat::DataFloat(std::string _name_) : name(_name_){}
+
+void DataFloat::draw() {
+    const char* data_name = name.c_str();
+
+    ImGui::Text(data_name);
+}
+
+IMGUIwindow::IMGUIwindow(std::string _name_) : name(_name_) {}
+
+std::weak_ptr<SliderFloat> IMGUIwindow::create_SliderFloat(std::string _name_,
+                                                           float _lower_border_,
+                                                           float _upper_border_,
+                                                           float* _data_) {
+    std::shared<SliderFloat> pSliderFloat = std::shared<SliderFloat>(_name_,
+                                                                     _lower_border_,
+                                                                     _upper_border_,
+                                                                     _data_);
+    pSliderFloats.emplace_back(pSliderFloat);
+    return pSliderFloat;
+}
+
+std::weak_ptr<DataFloat> create_DataFloat(std::string _name_) {
+    std::shared_ptr<DataFloat> pDataFloat = std::shared_ptr<DataFloat>(_name_);
+    pDataFloats.emplace_back(pDataFloat);
+    return pDataFloat;
+}
+
+void IMGUIwindow::draw() {
+    const char* window_name = name.c_str();
+
+    ImGui::Begin(window_name);
+
+    for (auto pSliderFloat : pSlidersFloat) {
+        pSliderFloat->draw();
     }
-    
-    static bool isCameraEnable = false;
-    ImGui::Checkbox("Show Camera parameters", &isCameraEnable);
-    
-    static bool isAudioEnable = false;
-    ImGui::Checkbox("Show Audio parameters", &isAudioEnable);
-    
-    for (auto& pGraphicsObject : pGraphicsObjects) {
-        std::string object_name = "Show " + pGraphicsObject->getObjectName() + " parameters";
-        ImGui::Checkbox(object_name.c_str(), pGraphicsObject->setShowWindowParameter());
+
+    for (auto pTextFloat : pTextFloat) {
+        pTextFloat->draw();
     }
-    
-    if (_pCamera_ != nullptr && isCameraEnable) {
-        static float camera_speed = 1.0f;
-        static float mouse_sensitivity = 0.5f;
-        static float z_near = 0.1f;
-        static float z_far = 1000.0f;
-        static float field_of_view = 45.0f;
-        
-        ImGui::Text("Camera info: ");
-        ImGui::SliderFloat("Camera speed", &camera_speed, 0.1f, 1000.0f);
-        ImGui::SliderFloat("Mouse sensitivity", &mouse_sensitivity, 0.1f, 10.0f);
-        ImGui::SliderFloat("Z near", &z_near, 0.1f, 10.0f);
-        ImGui::SliderFloat("Z far", &z_far, 0.1f, 10000.0f);
-        ImGui::SliderFloat("Field of view", &field_of_view, 30.0f, 90.0f);
-        
-        _pCamera_->setCameraSpeed(camera_speed);
-        _pCamera_->setMouseSensitivity(mouse_sensitivity);
-        
-        _pCamera_->setProjectionMatrix(window_width, window_height, z_near, z_far, field_of_view);
-    }
-    
-    if (pAudio != nullptr && isAudioEnable) {
-        static float volume = 0.5f;
-        
-        ImGui::Text("Audio info: ");
-        ImGui::SliderFloat("Audio volume: ", &volume, 0.0f, 1.0f);
-        
-        pAudio->setVolume(volume);
-    }
-    
-    for (auto& pGraphicsObject : pGraphicsObjects) {
-        if (*pGraphicsObject->setShowWindowParameter()) {
-            std::string name = pGraphicsObject->getObjectName();
-            const char* objectName = name.c_str();
-            ImGui::Begin(objectName);
-            
-            ImGui::SliderFloat("Position X: ", &pGraphicsObject->getPositionVec()->x, -50.0f, 50.0f);
-            ImGui::SliderFloat("Position Y: ", &pGraphicsObject->getPositionVec()->y, -50.0f, 50.0f);
-            ImGui::SliderFloat("Position Z: ", &pGraphicsObject->getPositionVec()->z, -50.0f, 50.0f);
-            
-            ImGui::End();
-        }
-    }
-    
+
     ImGui::End();
-}
-
-void IMGUIwindow::render(Camera* _pCamera_,
-                         VkCommandBuffer& commandBuffer) {
-    if (_pCamera_ != nullptr) {
-        ImGuiIO& io = ImGui::GetIO();
-        
-        if (io.WantCaptureMouse) _pCamera_->setDirectionUpdate(false);
-        else _pCamera_->setDirectionUpdate(true);
-    }
-    
-    ImGui::Render();
-    
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
-}
-
-std::weak_ptr<IMPLOTwindow> IMGUIwindow::create_ImPlot_window(const char* _graphic_name_,
-                                                              const char* _x_axis_name_,
-                                                              const char* _y_axis_name_,
-                                                              float _step_)
-{
-    std::shared_ptr<IMPLOTwindow> pIMPLOTwindow = std::make_shared<IMPLOTwindow>(_graphic_name_, _x_axis_name_, _y_axis_name_, _step_);
-    
-    pIMPLOTwindows.emplace_back(pIMPLOTwindow);
-    return pIMPLOTwindow;
-}
-
-IMGUIwindow::~IMGUIwindow() {
-    vkDeviceWaitIdle(pVulkanResources->getLogicalDevice());
-    
-    ImGui_ImplVulkan_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    
-    ImPlot::DestroyContext();
-    ImGui::DestroyContext();
-    
-    ConsoleText::printGreen("ImGui was destroyed!", "ImGui");
-    
-    pVulkanResources = nullptr;
-    pSwapChain = nullptr;
-    pAudio = nullptr;
 }
 
 }

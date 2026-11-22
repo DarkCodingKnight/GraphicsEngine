@@ -6,14 +6,16 @@ GraphicsObjectPool::GraphicsObjectPool(VulkanResources* _pVulkanResources_,
                                        DescriptorResources* _pDescriptorResources_,
                                        Sampler* _pSampler_,
                                        SwapChain* _pSwapChain_,
-                                       IMGUIwindow* _pIMGUIwindow_,
                                        VkCommandPool& _commandPool_,
                                        std::string vertexPath,
                                        std::string fragmentPath,
                                        const GLFWwindow* pGLFWwindow,
                                        uint16_t max_frames) :
-pVulkanResources(_pVulkanResources_), pDescriptorResources(_pDescriptorResources_), pSampler(_pSampler_),
-max_frames_in_flight(max_frames), commandPool(_commandPool_), pIMGUIwindow(_pIMGUIwindow_)
+    pVulkanResources(_pVulkanResources_),
+    pDescriptorResources(_pDescriptorResources_),
+    pSampler(_pSampler_),
+    max_frames_in_flight(max_frames),
+    commandPool(_commandPool_)
 {
     std::vector<char> vertCode{};
     std::vector<char> fragCode{};
@@ -51,7 +53,6 @@ std::weak_ptr<GraphicsObject> GraphicsObjectPool::createGraphicsObject(const cha
                                      object_name);
     
     pGraphicsObjects.push_back(pGraphicsObject);
-    pIMGUIwindow->setGraphicsObject(pGraphicsObject);
     
     return pGraphicsObject;
 }
